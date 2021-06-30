@@ -6,7 +6,7 @@ namespace BlackDuckCMDTools
 {
 
     // This is a class for deserialization only
-    public class BlackDuckAPIProject 
+    public class BlackDuckProject 
     {
         public string name;
         public string description;

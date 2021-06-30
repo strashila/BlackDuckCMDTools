@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BlackDuckCMDTools
 {
-    public class BlackDuckAPIProjectVersion
+    public class BlackDuckProjectVersion
     {
         public string versionName;
         public string nickname;

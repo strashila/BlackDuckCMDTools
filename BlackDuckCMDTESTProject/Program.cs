@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace BlackDuckCMDTESTProject
 {
@@ -24,12 +25,25 @@ namespace BlackDuckCMDTESTProject
             
 
             var projectName = "strashila_python_cicd_tests";
+            var versionName = "another_test_branch";
 
-            //Console.WriteLine(bd.ReturnPolicyRules());
+            var additionalSearchParams = "?offset=0&limit=500";
 
-            Console.WriteLine(bd.getProjectIDFromName(projectName));
+           //Console.WriteLine(bd.ReturnPolicyRules());
 
-            Console.WriteLine(bd.getProjectVersionsFromName(projectName));
+            //Console.WriteLine(bd.getProjectIDFromName(projectName));
+
+            //Console.WriteLine(bd.getVersionIDByProjectNameAndVersionName(projectName, versionName));
+
+            var components = bd.getComponentsFromProjectNameAndVersionName(projectName, versionName, additionalSearchParams);
+
+            foreach (var component in components)
+            {
+                var componentID = component.component.Split('/').Last();
+                Console.WriteLine("name: {0} ID:{1}", component.componentName, componentID);
+            }
+
+
         }
     }
 }

@@ -4,12 +4,10 @@ using System.Text;
 
 namespace BlackDuckCMDTools
 {
-
-    // This is a class for deserialization only
-    public class BlackDuckAPIProjectsListing
+    public class BlackDuckAPIComponentsListing
     {
         public int totalCount;
-        public List<BlackDuckProject> items;
+        public List<BlackDuckBOMComponent> items;
         public BlackDuckAPIMeta _meta;
     }
 }

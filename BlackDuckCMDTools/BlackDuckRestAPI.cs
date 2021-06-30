@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -94,17 +95,18 @@ namespace BlackDuckCMDTools
 
             else
             {
-                var project = projectsListing.items[0];
+                var project = projectsListing.items[0]; // First project by that name, should be the only one
                 var projectURL = project._meta.href;
                 var projectID = projectURL.Split('/').Last();
-
                 return projectID;
             }
 
         }
 
-        public string getProjectVersionsFromName(string projectName)
+        public List<string> getProjectVersionsFromName(string projectName)
         {
+            var versionIDs = new List<string>();
+            
             var projectID = this.getProjectIDFromName(projectName);
             if (projectID == null)
             {
@@ -117,11 +119,60 @@ namespace BlackDuckCMDTools
             var localRequestHandler = new AsyncRequestHandler();
             var projectsVersionsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
 
-            return projectsVersionsString;
+            var projectsVersionListing = JsonConvert.DeserializeObject<BlackDuckAPIProjectVersionsListing>(projectsVersionsString);
+
+            var versions = projectsVersionListing.items;
+
+            foreach (var version in versions)
+            {
+                var versionHref = version._meta.href;
+                var versionID = versionHref.Split('/').Last();
+                versionIDs.Add(versionID);
+            }
+
+            return versionIDs;
+        }
+
+        public string getVersionIDByProjectNameAndVersionName(string projectName, string versionName)
+        {
+            var projectID = this.getProjectIDFromName(projectName);
+            var additinalSearchParams = "?q=versionName:" + versionName;
+            var fullURL = this.baseUrl + "/api/projects/" + projectID + "/versions" + additinalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
+            var content = "";
+
+            var localRequestHandler = new AsyncRequestHandler();
+            var projectsVersionsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
+            var projectsVersionListing = JsonConvert.DeserializeObject<BlackDuckAPIProjectVersionsListing>(projectsVersionsString);
+
+            var version = projectsVersionListing.items[0]; // First version by that name, should be the only one
+
+            var versionURL = version._meta.href;
+            var versionID = versionURL.Split('/').Last();
+            return versionID;
+
+        }
+
+
+        public List<BlackDuckBOMComponent> getComponentsFromProjectNameAndVersionName(string projectname, string versionname, string additionalSearchParams)
+        {
+            var projectId = this.getProjectIDFromName(projectname);
+            var versionId = this.getVersionIDByProjectNameAndVersionName(projectname, versionname);
+            var fullURL = this.baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
+            var content = "";
+
+            var localRequestHandler = new AsyncRequestHandler();
+            var componentsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
+            var componentsListing = JsonConvert.DeserializeObject<BlackDuckAPIComponentsListing>(componentsString);
+            var components = componentsListing.items;
+            return components;
 
 
 
         }
+
+
 
 
         public HttpResponseMessage ReturnHttpResponseMessage()

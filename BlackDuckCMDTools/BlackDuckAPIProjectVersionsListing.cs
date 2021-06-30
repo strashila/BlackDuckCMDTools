@@ -8,7 +8,7 @@ namespace BlackDuckCMDTools
     public class BlackDuckAPIProjectVersionsListing
     {
         public int totalCount;
-        public List<BlackDuckAPIProjectVersion> items;
+        public List<BlackDuckProjectVersion> items;
         public BlackDuckAPIMeta _meta;
 
 
