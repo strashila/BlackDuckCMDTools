@@ -30,11 +30,6 @@ namespace BlackDuckCMDTESTProject
             //Console.WriteLine(bd.ReturnPolicyRules());
 
             Console.WriteLine(bd.getProjectIDFromName(projectName));
-
-
-
-
-
         }
     }
 }
