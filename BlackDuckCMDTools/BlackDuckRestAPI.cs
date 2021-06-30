@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Newtonsoft.Json;
@@ -74,7 +75,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string getProjectIDFromName(string projectName)
+        public string getProjectIDFromName(string projectName) //helper function
         {
             var additinalSearchParams = "?q=name:" + projectName;
             var fullURL = this.baseUrl + "/api/projects" + additinalSearchParams;
@@ -82,9 +83,43 @@ namespace BlackDuckCMDTools
             var content = "";
             
             var localRequestHandler = new AsyncRequestHandler();
-            var project = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
+            var projectsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
 
-            return project;
+            var projectsListing = JsonConvert.DeserializeObject<BlackDuckAPIProjectsListing>(projectsString);
+
+            if (projectsListing.totalCount == 0)
+            {
+                return null; //placeholder for throwing exception
+            }
+
+            else
+            {
+                var project = projectsListing.items[0];
+                var projectURL = project._meta.href;
+                var projectID = projectURL.Split('/').Last();
+
+                return projectID;
+            }
+
+        }
+
+        public string getProjectVersionsFromName(string projectName)
+        {
+            var projectID = this.getProjectIDFromName(projectName);
+            if (projectID == null)
+            {
+                return null; //placeholder for throwing exception
+            }
+            var fullURL = this.baseUrl + "/api/projects/" + projectID + "/versions";
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
+            var content = "";
+
+            var localRequestHandler = new AsyncRequestHandler();
+            var projectsVersionsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
+
+            return projectsVersionsString;
+
+
 
         }
 

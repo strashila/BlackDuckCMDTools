@@ -20,9 +20,7 @@ namespace BlackDuckCMDTESTProject
             var bdhash = "d38ca33891087edc69e76bc17fd2b5f813dd7466"; // my bd hash
            
 
-            BlackDuckRestAPI bd = new BlackDuckRestAPI(bdurl, bdtoken, bdhash);
-
-                      
+            BlackDuckRestAPI bd = new BlackDuckRestAPI(bdurl, bdtoken, bdhash);                      
             
 
             var projectName = "strashila_python_cicd_tests";
@@ -30,6 +28,8 @@ namespace BlackDuckCMDTESTProject
             //Console.WriteLine(bd.ReturnPolicyRules());
 
             Console.WriteLine(bd.getProjectIDFromName(projectName));
+
+            Console.WriteLine(bd.getProjectVersionsFromName(projectName));
         }
     }
 }
