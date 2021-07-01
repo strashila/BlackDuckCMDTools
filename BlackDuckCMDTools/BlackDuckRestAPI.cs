@@ -14,9 +14,6 @@ namespace BlackDuckCMDTools
         private string bearerToken;
         private string authorizationBearerString;
         private HttpClient httpClient;
-        private HttpResponseMessage responseMessage;
-        private HttpStatusCode responsestatuscode;
-
 
 
         public BlackDuckRestAPI(string url, string token)
@@ -28,7 +25,7 @@ namespace BlackDuckCMDTools
             this.authorizationBearerString = "Bearer " + bearerToken;
         }
 
-        public BlackDuckRestAPI(string url, string token, string bdserverhash) // overload for server hash
+        public BlackDuckRestAPI(string url, string token, string bdserverhash) // overload with server hash verification
         {
             this.baseUrl = url;
             this.APIToken = token;
@@ -100,7 +97,6 @@ namespace BlackDuckCMDTools
                 var projectID = projectURL.Split('/').Last();
                 return projectID;
             }
-
         }
 
         public List<string> getProjectVersionsFromName(string projectName)
@@ -150,7 +146,6 @@ namespace BlackDuckCMDTools
             var versionURL = version._meta.href;
             var versionID = versionURL.Split('/').Last();
             return versionID;
-
         }
 
 
@@ -167,30 +162,7 @@ namespace BlackDuckCMDTools
             var componentsListing = JsonConvert.DeserializeObject<BlackDuckAPIComponentsListing>(componentsString);
             var components = componentsListing.items;
             return components;
-
-
-
         }
-
-
-
-
-        public HttpResponseMessage ReturnHttpResponseMessage()
-        {
-            return this.responseMessage;
-        }
-
-
-
-
-
-
-
-
-
-
-
-
 
     }
 }

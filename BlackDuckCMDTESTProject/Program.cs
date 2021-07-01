@@ -13,15 +13,14 @@ namespace BlackDuckCMDTESTProject
         static void Main(string[] args)
         {
            
-
-            var bdtoken = "NDYwMWNhODktMWEzNS00NDc5LWFlNjQtYmZmMDUxY2Q4YzljOmMzOTAyNmIxLTllOTEtNDVkMS05YjIxLTZhOGFlYzQ4NmM5OQ==";            
-
             var bdurl = "https://sup-hub-knurenko01.dc1.lan";
+
+            var bdtoken = "NDYwMWNhODktMWEzNS00NDc5LWFlNjQtYmZmMDUxY2Q4YzljOmMzOTAyNmIxLTllOTEtNDVkMS05YjIxLTZhOGFlYzQ4NmM5OQ==";
 
             var bdhash = "d38ca33891087edc69e76bc17fd2b5f813dd7466"; // my bd hash
            
 
-            BlackDuckRestAPI bd = new BlackDuckRestAPI(bdurl, bdtoken, bdhash);                      
+            BlackDuckRestAPI bd = new BlackDuckRestAPI(bdurl, bdtoken);                      
             
 
             var projectName = "strashila_python_cicd_tests";
@@ -29,20 +28,14 @@ namespace BlackDuckCMDTESTProject
 
             var additionalSearchParams = "?offset=0&limit=500";
 
-           //Console.WriteLine(bd.ReturnPolicyRules());
-
-            //Console.WriteLine(bd.getProjectIDFromName(projectName));
-
-            //Console.WriteLine(bd.getVersionIDByProjectNameAndVersionName(projectName, versionName));
+            //Console.WriteLine(bd.ReturnPolicyRules());
 
             var components = bd.getComponentsFromProjectNameAndVersionName(projectName, versionName, additionalSearchParams);
 
             foreach (var component in components)
             {
-                var componentID = component.component.Split('/').Last();
-                Console.WriteLine("name: {0} ID:{1}", component.componentName, componentID);
+                Console.WriteLine("name: {0}, id:{1}", component.componentName, component.component.Split('/').Last());
             }
-
 
         }
     }
