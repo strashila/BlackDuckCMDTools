@@ -73,7 +73,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string getProjectIDFromName(string projectName) //helper function
+        public string getProjectIdFromName(string projectName) //helper function
         {
             var additinalSearchParams = "?q=name:" + projectName;
             var fullURL = this.baseUrl + "/api/projects" + additinalSearchParams;
@@ -99,11 +99,11 @@ namespace BlackDuckCMDTools
             }
         }
 
-        public List<string> getProjectVersionsFromName(string projectName)
+        public List<string> getProjectVersionsFromName(string projectName) //helper function
         {
             var versionIDs = new List<string>();
             
-            var projectID = this.getProjectIDFromName(projectName);
+            var projectID = this.getProjectIdFromName(projectName);
             if (projectID == null)
             {
                 return null; //placeholder for throwing exception
@@ -129,9 +129,9 @@ namespace BlackDuckCMDTools
             return versionIDs;
         }
 
-        public string getVersionIDByProjectNameAndVersionName(string projectName, string versionName)
+        public string getProjectVersionIdByProjectNameAndVersionName(string projectName, string versionName) //helper function
         {
-            var projectID = this.getProjectIDFromName(projectName);
+            var projectID = this.getProjectIdFromName(projectName);
             var additinalSearchParams = "?q=versionName:" + versionName;
             var fullURL = this.baseUrl + "/api/projects/" + projectID + "/versions" + additinalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
@@ -151,8 +151,8 @@ namespace BlackDuckCMDTools
 
         public List<BlackDuckBOMComponent> getComponentsFromProjectNameAndVersionName(string projectname, string versionname, string additionalSearchParams)
         {
-            var projectId = this.getProjectIDFromName(projectname);
-            var versionId = this.getVersionIDByProjectNameAndVersionName(projectname, versionname);
+            var projectId = this.getProjectIdFromName(projectname);
+            var versionId = this.getProjectVersionIdByProjectNameAndVersionName(projectname, versionname);
             var fullURL = this.baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
             var content = "";

@@ -10,7 +10,7 @@ namespace BlackDuckCMDTools
         public string nickname;
         public string phase;
         public string source;
-        public BlackDuckAPIMeta _meta;
+        public BlackDuckAPI_meta _meta;
 
     }
 }

@@ -18,7 +18,7 @@ namespace BlackDuckCMDTools
         public DateTime updatedAt;
         public string updatedBy;
         public string updatedByUser;
-        public BlackDuckAPIMeta _meta;
+        public BlackDuckAPI_meta _meta;
 
     }
 }

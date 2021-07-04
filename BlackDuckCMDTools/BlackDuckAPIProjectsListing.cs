@@ -10,6 +10,6 @@ namespace BlackDuckCMDTools
     {
         public int totalCount;
         public List<BlackDuckProject> items;
-        public BlackDuckAPIMeta _meta;
+        public BlackDuckAPI_meta _meta;
     }
 }

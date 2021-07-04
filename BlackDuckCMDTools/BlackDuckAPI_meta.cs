@@ -6,7 +6,7 @@ namespace BlackDuckCMDTools
 {
 
     // This is a class for deserialization only
-    public class BlackDuckAPIMeta
+    public class BlackDuckAPI_meta
     {
         public string[] allow;
         public string href;
