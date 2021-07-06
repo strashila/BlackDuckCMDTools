@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BlackDuckCMDTools
 {
@@ -16,11 +17,20 @@ namespace BlackDuckCMDTools
         private HttpClient httpClient;
 
 
-        public BlackDuckRestAPI(string url, string token)
+        public BlackDuckRestAPI(string url, string token, bool certValidation)
         {
             this.baseUrl = url;
             this.APIToken = token;
-            this.httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientNoCertificateValidation();  // this is for handler without cert validation. for regular httpclient use this.httpClient = new HttpClient();
+            if (certValidation)
+            {
+                this.httpClient = new HttpClient(); // regular HttpClient with cert validation
+            }
+
+            else
+            {
+                this.httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientNoCertificateValidation();  // this is for handler without cert validation. for regular httpclient use this.httpClient = new HttpClient();
+            }
+           
             this.bearerToken = this.CreateBearerToken();
             this.authorizationBearerString = "Bearer " + bearerToken;
         }
@@ -87,7 +97,7 @@ namespace BlackDuckCMDTools
 
             if (projectsListing.totalCount == 0)
             {
-                return null; //placeholder for throwing exception
+                return ""; //placeholder for throwing exception
             }
 
             else
@@ -99,35 +109,6 @@ namespace BlackDuckCMDTools
             }
         }
 
-        public List<string> getProjectVersionsFromName(string projectName) //helper function
-        {
-            var versionIDs = new List<string>();
-            
-            var projectID = this.getProjectIdFromName(projectName);
-            if (projectID == null)
-            {
-                return null; //placeholder for throwing exception
-            }
-            var fullURL = this.baseUrl + "/api/projects/" + projectID + "/versions";
-            var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
-            var content = "";
-
-            var localRequestHandler = new AsyncRequestHandler();
-            var projectsVersionsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
-
-            var projectsVersionListing = JsonConvert.DeserializeObject<BlackDuckAPIProjectVersionsListing>(projectsVersionsString);
-
-            var versions = projectsVersionListing.items;
-
-            foreach (var version in versions)
-            {
-                var versionHref = version._meta.href;
-                var versionID = versionHref.Split('/').Last();
-                versionIDs.Add(versionID);
-            }
-
-            return versionIDs;
-        }
 
         public string getProjectVersionIdByProjectNameAndVersionName(string projectName, string versionName) //helper function
         {
@@ -141,11 +122,64 @@ namespace BlackDuckCMDTools
             var projectsVersionsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
             var projectsVersionListing = JsonConvert.DeserializeObject<BlackDuckAPIProjectVersionsListing>(projectsVersionsString);
 
-            var version = projectsVersionListing.items[0]; // First version by that name, should be the only one
+            if (projectsVersionListing.totalCount == 0)
+            {
+                return ""; //placeholder for throwing exception
+            }
+                  
+            else
+            {
+                var version = projectsVersionListing.items[0]; // First version by that name, should be the only one
+                var versionURL = version._meta.href;
+                var versionID = versionURL.Split('/').Last();
+                return versionID;
+            }
+        }
 
-            var versionURL = version._meta.href;
-            var versionID = versionURL.Split('/').Last();
-            return versionID;
+
+
+        public string getBOMMatchedFilesWithComponent(string projectName, string versionName, string additionalSearchParams) 
+        {
+
+            /// api-doc/public.html#matched-file-with-component-representation
+            /// 
+
+            var projectId = this.getProjectIdFromName(projectName);
+            var versionId = this.getProjectVersionIdByProjectNameAndVersionName(projectName, versionName);
+            
+            var fullURL = this.baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/matched-files" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
+            var content = "";
+
+            var localRequestHandler = new AsyncRequestHandler();
+            var matchedFilesJson = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
+
+            var matchedFilesListingJobject = JObject.Parse(matchedFilesJson);
+
+            return matchedFilesListingJobject["items"].ToString();
+        }
+
+
+        public string getComponentMatchedFiles(string projectName, string versionName, string componentId, string additionalSearchParams)
+        {
+
+            /// api-doc/public.html#matched-file-representation
+            /// 
+
+            var projectId = this.getProjectIdFromName(projectName);
+            var versionId = this.getProjectVersionIdByProjectNameAndVersionName(projectName, versionName);
+
+            var fullURL = this.baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components/" + componentId + "/matched-files" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
+            var content = "";
+
+            var localRequestHandler = new AsyncRequestHandler();
+            var componentMatchedFilesJson = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
+
+            var listingJobject = JObject.Parse(componentMatchedFilesJson);
+
+            return listingJobject["items"].ToString();
+
         }
 
 
@@ -158,11 +192,24 @@ namespace BlackDuckCMDTools
             var content = "";
 
             var localRequestHandler = new AsyncRequestHandler();
-            var componentsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
-            var componentsListing = JsonConvert.DeserializeObject<BlackDuckAPIComponentsListing>(componentsString);
-            var components = componentsListing.items;
-            return components;
-        }
+            var componentListingJson = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
 
+            var componentListingJobject = JObject.Parse(componentListingJson);
+
+
+            /// This is an alternative method of parsing the Listing API response, where we don't deserialize the entire response
+            /// but parsing it with JObject.Parse and then casting the "items" list to appropriate type
+
+            var componentList = componentListingJobject["items"].ToObject<List<BlackDuckBOMComponent>>();
+            return componentList;
+
+
+
+            /// This is the method in which you Deserialize the reply json by listing object BlackDuckAPIComponentsListing
+
+            //var componentsListing = JsonConvert.DeserializeObject<BlackDuckAPIComponentsListing>(componentsString);
+            //var components = componentsListing.items;
+            //return components;
+        }
     }
 }
