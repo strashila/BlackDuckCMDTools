@@ -83,7 +83,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string getProjectIdFromName(string projectName) //helper function
+        public string getProjectIdFromName(string projectName) //helper function for ProjectId
         {
             var additinalSearchParams = "?q=name:" + projectName;
             var fullURL = this.baseUrl + "/api/projects" + additinalSearchParams;
@@ -97,7 +97,7 @@ namespace BlackDuckCMDTools
 
             if (projectsListing.totalCount == 0)
             {
-                return ""; //placeholder for throwing exception
+                return projectsString; //if no version found we returning the whole reply string
             }
 
             else
@@ -110,7 +110,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string getProjectVersionIdByProjectNameAndVersionName(string projectName, string versionName) //helper function
+        public string getProjectVersionIdByProjectNameAndVersionName(string projectName, string versionName) //helper function for projectVesrionId
         {
             var projectID = this.getProjectIdFromName(projectName);
             var additinalSearchParams = "?q=versionName:" + versionName;
@@ -124,7 +124,7 @@ namespace BlackDuckCMDTools
 
             if (projectsVersionListing.totalCount == 0)
             {
-                return ""; //placeholder for throwing exception
+                return projectsVersionsString; //if no project found we return the whole reply string
             }
                   
             else
@@ -138,7 +138,7 @@ namespace BlackDuckCMDTools
 
 
 
-        public string getBOMMatchedFilesWithComponent(string projectName, string versionName, string additionalSearchParams) 
+        public List<BlackDuckMatchedFileWithComponent> getBOMMatchedFilesWithComponent(string projectName, string versionName, string additionalSearchParams) 
         {
 
             /// api-doc/public.html#matched-file-with-component-representation
@@ -154,33 +154,32 @@ namespace BlackDuckCMDTools
             var localRequestHandler = new AsyncRequestHandler();
             var matchedFilesJson = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
 
-            var matchedFilesListingJobject = JObject.Parse(matchedFilesJson);
+            var matchedFilesListingJobject = JObject.Parse(matchedFilesJson);  // This is the basic Listing. It allways has totalCount, items, _meta 
 
-            return matchedFilesListingJobject["items"].ToString();
+            if (matchedFilesListingJobject["items"] != null)
+            {
+                return matchedFilesListingJobject["items"].ToObject<List<BlackDuckMatchedFileWithComponent>>(); //returns List<BlackDuckMatchedFileWithComponent>
+            }
+
+            else return null;
         }
 
 
-        public string getComponentMatchedFiles(string projectName, string versionName, string componentId, string additionalSearchParams)
+        public string parseComponentId (string component)
+
         {
-
-            /// api-doc/public.html#matched-file-representation
-            /// 
-
-            var projectId = this.getProjectIdFromName(projectName);
-            var versionId = this.getProjectVersionIdByProjectNameAndVersionName(projectName, versionName);
-
-            var fullURL = this.baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components/" + componentId + "/matched-files" + additionalSearchParams;
-            var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
-            var content = "";
-
-            var localRequestHandler = new AsyncRequestHandler();
-            var componentMatchedFilesJson = localRequestHandler.ReturnHTTPRequestResult(fullURL, this.authorizationBearerString, HttpMethod.Get, acceptHeader, content, this.httpClient);
-
-            var listingJobject = JObject.Parse(componentMatchedFilesJson);
-
-            return listingJobject["items"].ToString();
-
+            var compSplit = component.Split('/');
+            var compindex = Array.IndexOf(compSplit, "components");
+            if (compindex == -1)
+            {
+                return "";
+            }
+            else
+            {
+                return compSplit[compindex + 1];
+            }
         }
+
 
 
         public List<BlackDuckBOMComponent> getComponentsFromProjectNameAndVersionName(string projectname, string versionname, string additionalSearchParams)
@@ -199,6 +198,7 @@ namespace BlackDuckCMDTools
 
             /// This is an alternative method of parsing the Listing API response, where we don't deserialize the entire response
             /// but parsing it with JObject.Parse and then casting the "items" list to appropriate type
+            /// or we can return the entire ["items"] as string
 
             var componentList = componentListingJobject["items"].ToObject<List<BlackDuckBOMComponent>>();
             return componentList;

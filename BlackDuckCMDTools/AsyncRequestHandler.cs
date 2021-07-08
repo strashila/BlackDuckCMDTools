@@ -7,10 +7,7 @@ using System.Text;
 namespace BlackDuckCMDTools
 {
     public class AsyncRequestHandler
-    {
-
-        //public string httpStatusCode { get; private set; }
-        
+    {              
         public string ReturnHTTPRequestResult(string url, string authorizationTokenString, HttpMethod method, string acceptHeader, string content, HttpClient httpClient)
         {
             async System.Threading.Tasks.Task<string> MakeHTTPRequestAsync()
@@ -29,8 +26,6 @@ namespace BlackDuckCMDTools
 
                 var response = await httpClient.SendAsync(httpRequestMessage);
                 var responseContent = response.Content.ReadAsStringAsync().Result;
-
-                //this.httpStatusCode = response.StatusCode.GetHashCode().ToString() + " " + response.StatusCode.ToString();
 
                 return responseContent;
 
