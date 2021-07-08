@@ -16,7 +16,7 @@ namespace BlackDuckGetBomMatchedFiles
             /// Uses the beta System.CommandLine library to parse command line arguments 
             /// https://github.com/dotnet/command-line-api/blob/main/docs/Your-first-app-with-System-CommandLine.md
 
-            var additionalSearchParams = "?offset=0&limit=5000"; // might as well, never saw a need to paginate
+            
 
             var token = new Option<string>("--token");
             token.Description = "REQUIRED: BD Token";
@@ -30,9 +30,9 @@ namespace BlackDuckGetBomMatchedFiles
             var versionname = new Option<string>("--versionname");
             versionname.Description = "REQUIRED: Version name";
 
-            var secureConnection = new Option<bool>("--not-secure");
+            var notSecure = new Option<bool>("--not-secure");
             //secureConnection.SetDefaultValue(false);
-            secureConnection.Description = "disable secure connection";
+            notSecure.Description = "disable secure connection";
 
 
             var filePath = new Option<string>("--filepath");
@@ -40,22 +40,26 @@ namespace BlackDuckGetBomMatchedFiles
             filePath.Description = "Output filepath. If not present in option the tool prints to console";
 
 
+            var filter = new Option<string>("--filter");
+            filter.Description = "Supported Filters: [bomMatchType]";
+
             var rootCommand = new RootCommand
             {
                 token,
                 bdurl,
                 projectname,
                 versionname,
-                secureConnection,
-                filePath
+                notSecure,
+                filePath,
+                filter
             };
 
-            rootCommand.Handler = CommandHandler.Create<string, string, string, string, bool, string>((token, bdUrl, projectname, projectVersionName, notSecure, filepath) =>
+            rootCommand.Handler = CommandHandler.Create<string, string, string, string, bool, string, string>((token, bdUrl, projectname, versionname, notSecure, filePath, filter) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
                 List<BlackDuckMatchedFileWithComponent> matchedFiles;
 
-                
+                var additionalSearchParams = "?offset=0&limit=5000";
 
                 if (token == "" || bdUrl == "" || projectname == "")
                 {
@@ -70,13 +74,19 @@ namespace BlackDuckGetBomMatchedFiles
 
                 else { bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, true); }
 
-                matchedFiles = bdapi.getBOMMatchedFilesWithComponent(projectname, projectVersionName, additionalSearchParams);
-
-                var columnString = "fileURI;matchType;componentId";
-
-                if (filepath != "")
+                if (filter != "")
                 {
-                    Logger.Log(filepath, columnString);
+                    additionalSearchParams += "&" + filter;
+                }
+
+
+                matchedFiles = bdapi.getBOMMatchedFilesWithComponent(projectname, versionname, additionalSearchParams);
+
+                var columnString = "uri_or_declared_component_path;matchType;componentId";
+
+                if (filePath != "")
+                {
+                    Logger.Log(filePath, columnString);
                 }
 
                 
@@ -84,20 +94,20 @@ namespace BlackDuckGetBomMatchedFiles
                 foreach (var matchedfile in matchedFiles)
                 {
                     var matchesString = "";
-                    var matchedFileUri = matchedfile.uri;
-                    if (matchedFileUri == "" || matchedfile.uri == null)
+                    var matchedFileOrComponentPath = matchedfile.uri;
+                    if (matchedFileOrComponentPath == "" || matchedfile.uri == null)
                     {
-                        matchedFileUri = "no_uri_detected";
+                        matchedFileOrComponentPath = matchedfile.declaredComponentPath;
                     }
                     foreach (var match in matchedfile.matches)
                     {
                         var compId = bdapi.parseComponentId(match.component);
                         matchesString += match.matchType + ";" + compId;
                     }
-                    var logString = matchedFileUri + ";" + matchesString;
-                    if (filepath != "")
+                    var logString = matchedFileOrComponentPath + ";" + matchesString;
+                    if (filePath != "")
                     {
-                        Logger.Log(filepath, logString);
+                        Logger.Log(filePath, logString);
                     }
                     else
                     {
