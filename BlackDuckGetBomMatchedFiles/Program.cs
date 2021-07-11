@@ -32,12 +32,12 @@ namespace BlackDuckGetBomMatchedFiles
 
             var notSecure = new Option<bool>("--not-secure");
             //secureConnection.SetDefaultValue(false);
-            notSecure.Description = "disable secure connection";
+            notSecure.Description = "Disable secure connection to BlackDuck server";
 
 
             var filePath = new Option<string>("--filepath");
             filePath.AddAlias("-f");
-            filePath.Description = "Output filepath. If not present in option the tool prints to console";
+            filePath.Description = "Output filepath. If not present in options, the tool will print the output to console";
 
 
             var filter = new Option<string>("--filter");
