@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using System.Net.Http;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
 
@@ -69,18 +70,66 @@ namespace BlackDuckGetBomMatchedFiles
 
                 if (notSecure)
                 {
-                    bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, false);
+                    try
+                    {
+                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, false);
+                    }
+
+                    catch (Exception ex)
+                    {
+                        // catching AuthenticationException or HttpRequestException
+                        if (ex is System.AggregateException || ex is HttpRequestException || ex is System.Net.Sockets.SocketException || ex is System.Security.Authentication.AuthenticationException)
+                        {
+                            Console.WriteLine("Error: {0}", ex.Message);
+                            
+                        }
+                        return;
+
+                    }
+                    
                 }
 
-                else { bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, true); }
+                else
+                {
+                    try
+                    {
+                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, true);
+                    }
+
+                    catch (Exception ex)
+                    {
+                        // catching AuthenticationException or HttpRequestException
+
+                        if (ex is System.AggregateException || ex is HttpRequestException || ex is System.Net.Sockets.SocketException || ex is System.Security.Authentication.AuthenticationException)
+                        {
+                            Console.WriteLine("Error: {0}", ex.Message);
+
+                        }
+                        return;
+
+                    }
+                }
 
                 if (filter != "")
                 {
                     additionalSearchParams += "&" + filter;
                 }
 
+                
+                
 
-                matchedFiles = bdapi.GetBOMMatchedFilesWithComponent(projectName, versionName, additionalSearchParams);
+                try
+                {
+                    matchedFiles = bdapi.GetBOMMatchedFilesWithComponent(projectName, versionName, additionalSearchParams);
+                }
+                catch (Newtonsoft.Json.JsonReaderException ex)
+                {
+
+                    // Catching Serialization errors
+                    Console.WriteLine("Error: could not find Project Name or Version Name");
+                    return;
+                }
+                
 
                 var columnString = "uri_or_declared_component_path;matchType;componentId";
 

@@ -25,23 +25,30 @@ namespace BlackDuckCMDTools
             this._apiToken = token;
             if (certValidation)
             {
-                this._httpClient = new HttpClient(); // regular HttpClient with cert validation
+                // regular HttpClient with cert validation
+                this._httpClient = new HttpClient(); 
             }
 
             else
+
             {
-                this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientNoCertificateValidation();  // this is for handler without cert validation. for regular httpclient use this.httpClient = new HttpClient();
+                // this is for handler without cert validation. for regular httpclient use this.httpClient = new HttpClient();
+                this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientNoCertificateValidation();  
             }
            
             this._bearerToken = this.CreateBearerToken();
             this._authorizationBearerString = "Bearer " + _bearerToken;
         }
 
-        public BlackDuckRestAPI(string url, string token, string bdserverhash) // overload with server hash verification
+        public BlackDuckRestAPI(string url, string token, string bdserverhash) //
         {
+            /// This is an overload constructor with server hash verification
+            /// HTTPhandler is set to check specific server hash and validate by that hash
+            
+
             this._baseUrl = url;
             this._apiToken = token;
-            this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientCertificateValidationWithServerHash(bdserverhash); // This HTTPhandler is set to check specific server hash abd validate by that hash
+            this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientCertificateValidationWithServerHash(bdserverhash); 
             this._bearerToken = this.CreateBearerToken();
             this._authorizationBearerString = "Bearer " + _bearerToken;
         }
@@ -53,14 +60,9 @@ namespace BlackDuckCMDTools
             var fullURL = this._baseUrl + authURL;
             var tokenAuthString = "token " + this._apiToken;
             var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
-            //var localRequestHandler = new AsyncRequestHandler();
             var content = "";
 
             string bearerResponseString = this._httpClient.MakeHTTPRequestAsync(fullURL, tokenAuthString, HttpMethod.Post, acceptHeader, content).Result;
-
-            //var bearerResponseString = localRequestHandler.ReturnHTTPRequestResult(fullURL, tokenAuthString, HttpMethod.Post, acceptHeader, content, this._httpClient);
-
-
 
             BlackDuckBearerToken bearerResponse = JsonConvert.DeserializeObject<BlackDuckBearerToken>(bearerResponseString);         
 
@@ -146,7 +148,6 @@ namespace BlackDuckCMDTools
 
         public string GetProjectVersionIdByProjectNameAndVersionName(string projectName, string versionName) 
         {
-
             var projectID = this.GetProjectIdFromName(projectName);
             var additinalSearchParams = "?q=versionName:" + versionName;
             var fullURL = this._baseUrl + "/api/projects/" + projectID + "/versions" + additinalSearchParams;

@@ -17,7 +17,7 @@ namespace BlackDuckCMDTools
                 // Create a file to write to.
                 using (StreamWriter sw = File.CreateText(path))
                 {
-                    //sw.WriteLine("Starting logging: {0}", localDateTime);
+                    
                 }
             }
 

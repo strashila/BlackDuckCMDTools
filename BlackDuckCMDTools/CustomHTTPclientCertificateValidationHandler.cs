@@ -31,7 +31,7 @@ namespace BlackDuckCMDTools
 
         public HttpClient CreateHTTPClientCertificateValidationWithServerHash(string hash)
         {
-            // This HTTPhandler is set to check specific server hash abd validate by that hash
+            // This HTTPhandler is set to check specific server hash and validate by that hash
             // In Chrome click on Secure or Not Secure in the address bar. Then click on Certificate -> Details -> Thumbprint and copy the value.
 
             var httpClientHandler = new HttpClientHandler();
