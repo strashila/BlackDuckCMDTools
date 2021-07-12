@@ -21,14 +21,14 @@ namespace BlackDuckGetBomMatchedFiles
             var token = new Option<string>("--token");
             token.Description = "REQUIRED: BD Token";
 
-            var bdurl = new Option<string>("--bdurl");
-            bdurl.Description = "REQUIRED: BlackDuck URL";
+            var bdUrl = new Option<string>("--bdurl");
+            bdUrl.Description = "REQUIRED: BlackDuck URL";
 
-            var projectname = new Option<string>("--projectname");
-            projectname.Description = "REQUIRED: Project name";
+            var projectName = new Option<string>("--projectname");
+            projectName.Description = "REQUIRED: Project name";
 
-            var versionname = new Option<string>("--versionname");
-            versionname.Description = "REQUIRED: Version name";
+            var versioNname = new Option<string>("--versionname");
+            versioNname.Description = "REQUIRED: Version name";
 
             var notSecure = new Option<bool>("--not-secure");
             //secureConnection.SetDefaultValue(false);
@@ -46,22 +46,22 @@ namespace BlackDuckGetBomMatchedFiles
             var rootCommand = new RootCommand
             {
                 token,
-                bdurl,
-                projectname,
-                versionname,
+                bdUrl,
+                projectName,
+                versioNname,
                 notSecure,
                 filePath,
                 filter
             };
 
-            rootCommand.Handler = CommandHandler.Create<string, string, string, string, bool, string, string>((token, bdUrl, projectname, versionname, notSecure, filePath, filter) =>
+            rootCommand.Handler = CommandHandler.Create<string, string, string, string, bool, string, string>((token, bdUrl, projectName, versionName, notSecure, filePath, filter) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
                 List<BlackDuckMatchedFileWithComponent> matchedFiles;
 
                 var additionalSearchParams = "?offset=0&limit=5000";
 
-                if (token == "" || bdUrl == "" || projectname == "")
+                if (token == "" || bdUrl == "" || projectName == "")
                 {
                     Console.WriteLine("Parameters missing, use --help");
                     return;
@@ -80,7 +80,7 @@ namespace BlackDuckGetBomMatchedFiles
                 }
 
 
-                matchedFiles = bdapi.getBOMMatchedFilesWithComponent(projectname, versionname, additionalSearchParams);
+                matchedFiles = bdapi.GetBOMMatchedFilesWithComponent(projectName, versionName, additionalSearchParams);
 
                 var columnString = "uri_or_declared_component_path;matchType;componentId";
 
@@ -91,20 +91,20 @@ namespace BlackDuckGetBomMatchedFiles
 
                 
 
-                foreach (var matchedfile in matchedFiles)
+                foreach (BlackDuckMatchedFileWithComponent matchedfile in matchedFiles)
                 {
                     var matchesString = "";
-                    var matchedFileOrComponentPath = matchedfile.uri;
+                    string matchedFileOrComponentPath = matchedfile.uri;
                     if (matchedFileOrComponentPath == "" || matchedfile.uri == null)
                     {
                         matchedFileOrComponentPath = matchedfile.declaredComponentPath;
                     }
-                    foreach (var match in matchedfile.matches)
+                    foreach (BlackDuckMatchedFileWithComponentMatch match in matchedfile.matches)
                     {
-                        var compId = bdapi.parseComponentId(match.component);
+                        string compId = bdapi.ParseComponentId(match.component);
                         matchesString += match.matchType + ";" + compId;
                     }
-                    var logString = matchedFileOrComponentPath + ";" + matchesString;
+                    string logString = matchedFileOrComponentPath + ";" + matchesString;
                     if (filePath != "")
                     {
                         Logger.Log(filePath, logString);
