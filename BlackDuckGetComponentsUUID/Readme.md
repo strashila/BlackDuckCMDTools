@@ -1,5 +1,5 @@
-BlackDuckGetComponentsUUID is a tool that lists all the component UUID for a specific project version. 
-API endpoint at /api/projects/{projectId}/versions/{projectVersionId}/components
+BlackDuckGetComponentsUUID is a tool that lists all the component UUID for a specific project version.  
+API endpoint at /api/projects/{projectId}/versions/{projectVersionId}/components.  
 
 The tool builds a CSV-like output with component name, and UUID. 
 
