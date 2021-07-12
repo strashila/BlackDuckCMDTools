@@ -2,7 +2,8 @@ BlackDuckGetBomMatchedFiles is a tool that chains API calls to get the list of a
 /api/projects/{projectId}/versions/{projectVersionId}/components/{componentId}/matched-files
 
 The tool builds a CSV-like output with uri or declaredComponentPath, matchType and componentId.  
-The command line options parsing is done with System.CommandLine library   https://github.com/dotnet/command-line-api/blob/main/docs/Your-first-app-with-System-CommandLine.md
+The command line options parsing is done with System.CommandLine library  
+https://github.com/dotnet/command-line-api/blob/main/docs/Your-first-app-with-System-CommandLine.md
 
  
 Usage:
