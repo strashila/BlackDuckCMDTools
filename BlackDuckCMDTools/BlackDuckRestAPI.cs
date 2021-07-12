@@ -78,9 +78,6 @@ namespace BlackDuckCMDTools
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
             var content = "";
 
-            //var localRequestHandler = new AsyncRequestHandler();
-            //var componentListingJson = localRequestHandler.ReturnHTTPRequestResult(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content, this._httpClient);
-
             string componentListingJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
             var componentListingJobject = JObject.Parse(componentListingJson);
@@ -109,10 +106,6 @@ namespace BlackDuckCMDTools
             var acceptHeader = "application/vnd.blackducksoftware.policy-5+json";
             var content = "";
 
-            //var localRequestHandler = new AsyncRequestHandler();
-
-            //var policyRules = localRequestHandler.ReturnHTTPRequestResult(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content, this._httpClient);
-
             string policyRules = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
             return policyRules;
         }
@@ -129,9 +122,6 @@ namespace BlackDuckCMDTools
             var fullURL = this._baseUrl + "/api/projects" + additinalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-4+json";
             var content = "";
-
-            //var localRequestHandler = new AsyncRequestHandler();
-            //var projectsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content, this._httpClient);
 
             string projectsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
@@ -162,9 +152,6 @@ namespace BlackDuckCMDTools
             var fullURL = this._baseUrl + "/api/projects/" + projectID + "/versions" + additinalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
             var content = "";
-
-            //var localRequestHandler = new AsyncRequestHandler();
-            //string projectsVersionsString = localRequestHandler.ReturnHTTPRequestResult(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content, this._httpClient);
 
             string projectsVersionsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
@@ -199,9 +186,6 @@ namespace BlackDuckCMDTools
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
             var content = "";
 
-            //var localRequestHandler = new AsyncRequestHandler();
-            //string matchedFilesJson = localRequestHandler.ReturnHTTPRequestResult(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content, this._httpClient);
-
             string matchedFilesJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
             JObject matchedFilesListingJobject = JObject.Parse(matchedFilesJson);  
@@ -229,8 +213,6 @@ namespace BlackDuckCMDTools
                 return compSplit[compIndex + 1];
             }
         }
-
-
 
 
     }
