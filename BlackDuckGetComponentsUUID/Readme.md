@@ -18,4 +18,4 @@ Options:
 
 Example usage:  
 
-C:\dev\synopsys\BlackDuckCMDTools\BlackDuckGetComponentsUUID\bin\Debug\netcoreapp3.1>BlackDuckGetComponentsUUID.exe --token <token> --bdurl <BD-server-url> --not-secure --projectname <projectName> --versionname <projectVersionName> -f c:\temp\components.txt
+C:\dev\synopsys\BlackDuckCMDTools\BlackDuckGetComponentsUUID\bin\Debug\netcoreapp3.1>BlackDuckGetComponentsUUID.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --not-secure --projectname `<projectName>` --versionname `<projectVersionName>` -f c:\temp\components.txt
