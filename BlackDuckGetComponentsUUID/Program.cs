@@ -123,7 +123,7 @@ namespace BlackDuckGetBomMatchedFiles
                 }
 
 
-                var columnString = "FileName;UUID";
+                var columnString = "ComponentName;UUID";
 
                 if (filePath != "")
                 {
