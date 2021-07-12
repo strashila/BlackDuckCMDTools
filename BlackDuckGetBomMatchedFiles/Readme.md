@@ -19,3 +19,6 @@ Options:
   --filter <filter>            | Supported Filters: [bomMatchType]  
   --version                    | Show version information  
   -?, -h, --help               | Show help and usage information  
+ 
+ Example usage:
+C:\dev\synopsys\BlackDuckCMDTools\BlackDuckGetBomMatchedFiles\bin\Debug\netcoreapp3.1>BlackDuckGetBomMatchedFiles.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `<projectName>` --versionname `<projectVersionName>` --filter filter=-f c:\temp\components.txt --not-secure --filter filter=bomMatchType:FILE_DEPENDENCY_TRANSITIVE
