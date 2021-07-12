@@ -72,7 +72,7 @@ namespace BlackDuckCMDTools
 
 
 
-        public List<BlackDuckBOMComponent> GetComponentsFromProjectNameAndVersionName(string projectname, string versionname, string additionalSearchParams)
+        public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectVersion(string projectname, string versionname, string additionalSearchParams)
         {
             var projectId = this.GetProjectIdFromName(projectname);
             var versionId = this.GetProjectVersionIdByProjectNameAndVersionName(projectname, versionname);
@@ -91,8 +91,6 @@ namespace BlackDuckCMDTools
 
             var componentList = componentListingJobject["items"].ToObject<List<BlackDuckBOMComponent>>();
             return componentList;
-
-
 
             /// This is the method in which you Deserialize the reply json by listing object BlackDuckAPIComponentsListing
 
