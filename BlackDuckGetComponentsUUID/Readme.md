@@ -15,3 +15,7 @@ Options:
 --filter | Supported Filters: /api-doc/public.html#_listing_bom_components  
 --version | Show version information  
 -?, -h, --help | Show help and usage information
+
+Example usage:  
+
+C:\dev\synopsys\BlackDuckCMDTools\BlackDuckGetComponentsUUID\bin\Debug\netcoreapp3.1>BlackDuckGetComponentsUUID.exe --token <token> --bdurl <BD-server-url> --not-secure --projectname <projectName> --versionname <projectVersionName> -f c:\temp\components.txt
