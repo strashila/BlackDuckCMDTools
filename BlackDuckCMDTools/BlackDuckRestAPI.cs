@@ -32,7 +32,7 @@ namespace BlackDuckCMDTools
             else
 
             {
-                // this is for handler without cert validation. for regular httpclient use this.httpClient = new HttpClient();
+                // HttpClient without cert validation. For regular httpclient use this.httpClient = new HttpClient();
                 this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientNoCertificateValidation();  
             }
            
@@ -48,7 +48,7 @@ namespace BlackDuckCMDTools
 
             this._baseUrl = url;
             this._apiToken = token;
-            this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientCertificateValidationWithServerHash(bdserverhash); 
+            this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientCertificateValidationWithServerHash(bdserverhash);
             this._bearerToken = this.CreateBearerToken();
             this._authorizationBearerString = "Bearer " + _bearerToken;
         }

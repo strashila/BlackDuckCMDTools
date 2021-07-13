@@ -79,7 +79,7 @@ namespace BlackDuckGetBomMatchedFiles
                         // catching AuthenticationException or HttpRequestException
                         if (ex is System.AggregateException || ex is HttpRequestException || ex is System.Net.Sockets.SocketException || ex is System.Security.Authentication.AuthenticationException)
                         {
-                            Console.WriteLine($"Error: {ex.Message}");
+                            Console.WriteLine($"\nError: {ex.Message}");
                         }
                         return;
                     }
@@ -98,7 +98,7 @@ namespace BlackDuckGetBomMatchedFiles
 
                         if (ex is System.AggregateException || ex is HttpRequestException || ex is System.Net.Sockets.SocketException || ex is System.Security.Authentication.AuthenticationException)
                         {
-                            Console.WriteLine($"Error: {ex.Message}");
+                            Console.WriteLine($"\nError: {ex.Message}");
                         }
                         return;
                     }
@@ -118,7 +118,7 @@ namespace BlackDuckGetBomMatchedFiles
                 catch (Newtonsoft.Json.JsonReaderException ex)
                 {
                     // Catching Serialization errors
-                    Console.WriteLine("Error: Please check that you have correct Project Name, Version Name and Bearer Token with appropriate permissions");
+                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Bearer Token with appropriate permissions");
                     return;
                 }
 
@@ -137,7 +137,7 @@ namespace BlackDuckGetBomMatchedFiles
                     {
                         if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
                         {
-                            Console.WriteLine($"{ex.Message} or filename not specified");
+                            Console.WriteLine($"\n{ex.Message} or filename not specified");
                             return;
                         }
                     }
@@ -162,7 +162,7 @@ namespace BlackDuckGetBomMatchedFiles
                         Console.WriteLine(logString);
                     }
                 }
-                Console.WriteLine($"Finished logging to file {filePath}");
+                Console.WriteLine($"\nFinished logging to file {filePath}");
             });
 
             // Parse the incoming args and invoke the handler
