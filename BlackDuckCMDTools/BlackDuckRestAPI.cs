@@ -82,14 +82,12 @@ namespace BlackDuckCMDTools
 
             string componentListingJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
-            var componentListingJobject = JObject.Parse(componentListingJson);
-
-
             /// This is an alternative method of parsing the Listing API response, where we don't deserialize the entire response
             /// but parsing it with JObject.Parse and then casting the "items" list to appropriate type
             /// or we can return the entire ["items"] as string
 
-            var componentList = componentListingJobject["items"].ToObject<List<BlackDuckBOMComponent>>();
+            JObject componentListingJobject = JObject.Parse(componentListingJson);
+            List<BlackDuckBOMComponent> componentList = componentListingJobject["items"].ToObject<List<BlackDuckBOMComponent>>();
             return componentList;
 
             /// This is the method in which you Deserialize the reply json by listing object BlackDuckAPIComponentsListing
@@ -136,19 +134,40 @@ namespace BlackDuckCMDTools
             else
             {
                 // First project in the list, should be the only one
-                var project = projectsListing.items[0];
-                var projectURL = project._meta.href;
-                var projectId = projectURL.Split('/').Last();
+                BlackDuckProject project = projectsListing.items[0];
+
+                string projectId = GetProjectIdFromProjectObject(project);
                 return projectId;
+
             }
+        }
+
+        public List<BlackDuckProject> GetAllProjects(string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/projects" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-4+json";
+            var content = "";
+            string projectsVersionsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject projectJObject = JObject.Parse(projectsVersionsString);
+            List<BlackDuckProject> projectList = projectJObject["items"].ToObject<List<BlackDuckProject>>();
+            return projectList;
+        }
+
+
+        public string GetProjectIdFromProjectObject(BlackDuckProject proj)
+        {
+            string projectURL = proj._meta.href;
+            return projectURL.Split('/').Last();
+
         }
 
 
         public string GetProjectVersionIdFromProjectNameAndVersionName(string projectName, string versionName) 
         {
-            var projectID = this.GetProjectIdFromName(projectName);
+            var projectId = this.GetProjectIdFromName(projectName);
             var additinalSearchParams = "?q=versionName:" + versionName;
-            var fullURL = this._baseUrl + "/api/projects/" + projectID + "/versions" + additinalSearchParams;
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions" + additinalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
             var content = "";
 

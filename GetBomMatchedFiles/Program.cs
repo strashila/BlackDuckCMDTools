@@ -59,7 +59,7 @@ namespace GetBomMatchedFiles
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
                 List<BlackDuckMatchedFileWithComponent> matchedFiles;
 
-                var additionalSearchParams = "?offset=0&limit=5000";
+                var additionalSearchParams = "?offset=0&limit=500";
 
                 if (token == "" || bdUrl == "" || projectName == "")
                 {
