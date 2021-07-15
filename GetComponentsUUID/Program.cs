@@ -7,7 +7,7 @@ using System.Net.Http;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
 
-namespace GetBomMatchedFiles
+namespace GetComponentsUUID
 {
     class Program
     {
@@ -17,12 +17,12 @@ namespace GetBomMatchedFiles
             /// Uses the beta System.CommandLine library to parse command line arguments 
             /// https://github.com/dotnet/command-line-api/blob/main/docs/Your-first-app-with-System-CommandLine.md
 
-
             var bdUrl = new Option<string>("--bdurl");
             bdUrl.Description = "REQUIRED: BlackDuck URL";
 
             var token = new Option<string>("--token");
             token.Description = "REQUIRED: BD Token";
+
 
             var projectName = new Option<string>("--projectname");
             projectName.Description = "REQUIRED: Project name";
@@ -41,12 +41,12 @@ namespace GetBomMatchedFiles
 
 
             var filter = new Option<string>("--filter");
-            filter.Description = "Supported Filters: [bomMatchType]";
+            filter.Description = "Supported Filters: see list here: /api-doc/public.html#_listing_bom_components";
 
             var rootCommand = new RootCommand
             {
                 bdUrl,
-                token,
+                token,                
                 projectName,
                 versioNname,
                 notSecure,
@@ -57,7 +57,7 @@ namespace GetBomMatchedFiles
             rootCommand.Handler = CommandHandler.Create<string, string, string, string, bool, string, string>((bdUrl, token, projectName, versionName, notSecure, filePath, filter) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
-                List<BlackDuckMatchedFileWithComponent> matchedFiles;
+                List<BlackDuckBOMComponent> components;
 
                 var additionalSearchParams = "?offset=0&limit=5000";
 
@@ -109,19 +109,21 @@ namespace GetBomMatchedFiles
                     additionalSearchParams += "&" + filter;
                 }
 
+
                 try
                 {
-                    matchedFiles = bdapi.GetBOMMatchedFilesWithComponent(projectName, versionName, additionalSearchParams);
+                    // Getting the components
+                    components = bdapi.GetBOMComponentsFromProjectVersion(projectName, versionName, additionalSearchParams);
                 }
                 catch (Newtonsoft.Json.JsonReaderException ex)
                 {
                     // Catching Serialization errors
-                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Token with appropriate permissions");
+                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Bearer Token with appropriate permissions");
                     return;
                 }
 
 
-                var columnString = "uri_or_declared_component_path;matchType;componentId";
+                var columnString = "ComponentName;UUID";
 
                 if (filePath != "")
                 {
@@ -131,7 +133,7 @@ namespace GetBomMatchedFiles
                     }
 
                     catch (Exception ex)
-                    //Catching exception for invalid FilePath
+                    //Catching exception for invalid FilePath input
                     {
                         if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
                         {
@@ -139,30 +141,21 @@ namespace GetBomMatchedFiles
                             return;
                         }
                     }
+
+
                 }
 
 
-                foreach (BlackDuckMatchedFileWithComponent matchedfile in matchedFiles)
+                foreach (BlackDuckBOMComponent component in components)
                 {
-                    var matchesString = "";
-                    string matchedFileOrComponentPath = matchedfile.uri;
+                    string uuid = bdapi.ParseComponentId(component.component);
 
-                    if (matchedFileOrComponentPath == "" || matchedfile.uri == null)
-                    {
-                        matchedFileOrComponentPath = matchedfile.declaredComponentPath;
-                    }
-
-                    foreach (BlackDuckMatchedFileWithComponentMatch match in matchedfile.matches)
-                    {
-                        string compId = bdapi.ParseComponentId(match.component);
-                        matchesString += match.matchType + ";" + compId;
-                    }
-
-                    string logString = matchedFileOrComponentPath + ";" + matchesString;
+                    string logString = component.componentName + ";" + uuid;
 
                     if (filePath != "")
                     {
                         Logger.Log(filePath, logString);
+
                     }
                     else
                     {

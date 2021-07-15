@@ -12,6 +12,5 @@ namespace BlackDuckCMDTools
         public string phase;
         public string source;
         public BlackDuckAPI_meta _meta;
-
     }
 }
