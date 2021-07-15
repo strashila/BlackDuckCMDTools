@@ -1,6 +1,16 @@
-<h2>BlackDuckCMDTools</h2>  
+**GetAllProjectsWithVersionCount** gets the list of all projects in the server with version count.
+ 
+Usage:
+  GetAllProjectsWithVersionCount [options]
 
-The goal of this project is to build a C# library with a set of tools to work with Black Duck REST API, and populate it over time with different tools, that can hain together a number of API calls to get the requested info from the API.  
+Options:  
 
+ --token <token>               | REQUIRED: BD Token  
+ --bdurl <bdurl>               | REQUIRED: BlackDuck URL   
+ --not-secure                 | Allways trust server certificate  
+ -f, --filepath <filepath>    | Output filepath. If not present in options, the tool will print the output to console  
+ --filter <filter>            | Supported Filters: [bomMatchType]  
+ --version                    | Show version information  
+ -?, -h, --help               | Show help and usage information  
+ 
 
-At the moment all the specific tool information and examples are in the respective tool folders
