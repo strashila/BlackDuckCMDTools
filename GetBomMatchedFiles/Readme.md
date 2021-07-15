@@ -1,4 +1,4 @@
-**BlackDuckGetBomMatchedFiles** is a tool that gets the list of all matched files from matched file API endpoint at 
+**GetBomMatchedFiles** is a tool that gets the list of all matched files from matched file API endpoint at 
 /api/projects/{projectId}/versions/{projectVersionId}/components/{componentId}/matched-files
 
 
@@ -13,7 +13,7 @@ Usage:
 Options:  
 
  --token <token>               | REQUIRED: BD Token  
- --bdurl <bdurl>               | REQUIRED: BlackDuck URL   
+ --bdurl <bdurl>               | REQUIRED: BD URL   
   --projectname <projectname>  | REQUIRED: Project name   
   --versionname <versionname>  | REQUIRED: Version name   
   --not-secure                 | Allways trust server certificate  
@@ -23,4 +23,4 @@ Options:
   -?, -h, --help               | Show help and usage information  
  
  Example usage:
-C:\dev\synopsys\BlackDuckCMDTools\BlackDuckGetBomMatchedFiles\bin\Debug\netcoreapp3.1>BlackDuckGetBomMatchedFiles.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `<projectName>` --versionname `<projectVersionName>` -f c:\temp\components.txt --not-secure --filter filter=bomMatchType:FILE_DEPENDENCY_TRANSITIVE
+C:\dev\synopsys\BlackDuckCMDTools\GetBomMatchedFiles\bin\Debug\netcoreapp3.1>GetBomMatchedFiles.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `<projectName>` --versionname `<projectVersionName>` -f `c:\temp\components.txt` --not-secure --filter `filter=bomMatchType:FILE_DEPENDENCY_TRANSITIVE`
