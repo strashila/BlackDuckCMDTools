@@ -7,7 +7,7 @@ using System.Net.Http;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
 
-namespace BlackDuckGetBomMatchedFiles
+namespace GetBomMatchedFiles
 {
     class Program
     {
@@ -108,7 +108,7 @@ namespace BlackDuckGetBomMatchedFiles
                 {
                     additionalSearchParams += "&" + filter;
                 }
-                
+
 
                 try
                 {
@@ -141,16 +141,16 @@ namespace BlackDuckGetBomMatchedFiles
                             return;
                         }
                     }
-                    
+
 
                 }
 
 
                 foreach (BlackDuckBOMComponent component in components)
                 {
-                    string uuid = bdapi.ParseComponentId(component.component);              
+                    string uuid = bdapi.ParseComponentId(component.component);
 
-                    string logString = component.componentName+ ";" + uuid;
+                    string logString = component.componentName + ";" + uuid;
 
                     if (filePath != "")
                     {

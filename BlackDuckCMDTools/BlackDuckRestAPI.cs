@@ -75,7 +75,7 @@ namespace BlackDuckCMDTools
         public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectVersion(string projectname, string versionname, string additionalSearchParams)
         {
             var projectId = this.GetProjectIdFromName(projectname);
-            var versionId = this.GetProjectVersionIdByProjectNameAndVersionName(projectname, versionname);
+            var versionId = this.GetProjectVersionIdFromProjectNameAndVersionName(projectname, versionname);
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
             var content = "";
@@ -144,7 +144,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string GetProjectVersionIdByProjectNameAndVersionName(string projectName, string versionName) 
+        public string GetProjectVersionIdFromProjectNameAndVersionName(string projectName, string versionName) 
         {
             var projectID = this.GetProjectIdFromName(projectName);
             var additinalSearchParams = "?q=versionName:" + versionName;
@@ -171,6 +171,21 @@ namespace BlackDuckCMDTools
         }
 
 
+        public List<BlackDuckProjectVersion> GetProjectVersionsFromProjectId(string projectId, string additinalSearchParams)
+        {
+
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions" + additinalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
+            var content = "";
+
+            string projectsVersionsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            List<BlackDuckProjectVersion> projectsVersions = JsonConvert.DeserializeObject<BlackDuckAPIProjectVersionsListing>(projectsVersionsString).items;
+
+            return projectsVersions;
+        }
+
+
 
         public List<BlackDuckMatchedFileWithComponent> GetBOMMatchedFilesWithComponent(string projectName, string versionName, string additionalSearchParams) 
         {
@@ -179,7 +194,7 @@ namespace BlackDuckCMDTools
             /// 
 
             string projectId = this.GetProjectIdFromName(projectName);
-            string versionId = this.GetProjectVersionIdByProjectNameAndVersionName(projectName, versionName);
+            string versionId = this.GetProjectVersionIdFromProjectNameAndVersionName(projectName, versionName);
             
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/matched-files" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";

@@ -7,7 +7,7 @@ using System.Net.Http;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
 
-namespace BlackDuckGetBomMatchedFiles
+namespace GetComponentsUUID
 {
     class Program
     {
@@ -17,7 +17,6 @@ namespace BlackDuckGetBomMatchedFiles
             /// Uses the beta System.CommandLine library to parse command line arguments 
             /// https://github.com/dotnet/command-line-api/blob/main/docs/Your-first-app-with-System-CommandLine.md
 
-            
 
             var token = new Option<string>("--token");
             token.Description = "REQUIRED: BD Token";
@@ -42,7 +41,7 @@ namespace BlackDuckGetBomMatchedFiles
 
 
             var filter = new Option<string>("--filter");
-            filter.Description = "Supported Filters: [bomMatchType]";
+            filter.Description = "Supported Filters: see list here: /api-doc/public.html#_listing_bom_components";
 
             var rootCommand = new RootCommand
             {
@@ -58,7 +57,7 @@ namespace BlackDuckGetBomMatchedFiles
             rootCommand.Handler = CommandHandler.Create<string, string, string, string, bool, string, string>((token, bdUrl, projectName, versionName, notSecure, filePath, filter) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
-                List<BlackDuckMatchedFileWithComponent> matchedFiles;
+                List<BlackDuckBOMComponent> components;
 
                 var additionalSearchParams = "?offset=0&limit=5000";
 
@@ -72,7 +71,7 @@ namespace BlackDuckGetBomMatchedFiles
                 {
                     try
                     {
-                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, false);                        
+                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, false);
                     }
 
                     catch (Exception ex)
@@ -83,7 +82,7 @@ namespace BlackDuckGetBomMatchedFiles
                             Console.WriteLine($"\nError: {ex.Message}");
                         }
                         return;
-                    }                    
+                    }
                 }
 
                 else
@@ -108,21 +107,23 @@ namespace BlackDuckGetBomMatchedFiles
                 if (filter != "")
                 {
                     additionalSearchParams += "&" + filter;
-                }                                           
+                }
+
 
                 try
                 {
-                    matchedFiles = bdapi.GetBOMMatchedFilesWithComponent(projectName, versionName, additionalSearchParams);
+                    // Getting the components
+                    components = bdapi.GetBOMComponentsFromProjectVersion(projectName, versionName, additionalSearchParams);
                 }
                 catch (Newtonsoft.Json.JsonReaderException ex)
                 {
                     // Catching Serialization errors
-                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Token with appropriate permissions");
+                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Bearer Token with appropriate permissions");
                     return;
                 }
-                
 
-                var columnString = "uri_or_declared_component_path;matchType;componentId";
+
+                var columnString = "ComponentName;UUID";
 
                 if (filePath != "")
                 {
@@ -132,7 +133,7 @@ namespace BlackDuckGetBomMatchedFiles
                     }
 
                     catch (Exception ex)
-                    //Catching exception for invalid FilePath
+                    //Catching exception for invalid FilePath input
                     {
                         if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
                         {
@@ -140,42 +141,33 @@ namespace BlackDuckGetBomMatchedFiles
                             return;
                         }
                     }
-                }
-                
 
-                foreach (BlackDuckMatchedFileWithComponent matchedfile in matchedFiles)
+
+                }
+
+
+                foreach (BlackDuckBOMComponent component in components)
                 {
-                    var matchesString = "";
-                    string matchedFileOrComponentPath = matchedfile.uri;
-                    
-                    if (matchedFileOrComponentPath == "" || matchedfile.uri == null)
-                    {
-                        matchedFileOrComponentPath = matchedfile.declaredComponentPath;
-                    }
-                    
-                    foreach (BlackDuckMatchedFileWithComponentMatch match in matchedfile.matches)
-                    {
-                        string compId = bdapi.ParseComponentId(match.component);
-                        matchesString += match.matchType + ";" + compId;
-                    }
-                    
-                    string logString = matchedFileOrComponentPath + ";" + matchesString;
-                    
+                    string uuid = bdapi.ParseComponentId(component.component);
+
+                    string logString = component.componentName + ";" + uuid;
+
                     if (filePath != "")
                     {
                         Logger.Log(filePath, logString);
+
                     }
                     else
                     {
                         Console.WriteLine(logString);
-                    }                    
+                    }
                 }
                 Console.WriteLine($"\nFinished logging to file {filePath}");
             });
 
             // Parse the incoming args and invoke the handler
             return rootCommand.InvokeAsync(args).Result;
-            
+
         }
     }
 }
