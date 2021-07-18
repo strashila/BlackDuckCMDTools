@@ -74,7 +74,7 @@ namespace BlackDuckCMDTools
         public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectVersion(string projectname, string versionname, string additionalSearchParams)
         {
             var projectId = this.GetProjectIdFromName(projectname);
-            var versionId = this.GetProjectVersionIdFromProjectNameAndVersionName(projectname, versionname);
+            var versionId = this.GetVersionIdFromProjectNameAndVersionName(projectname, versionname);
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
             var content = new StringContent("");
@@ -90,11 +90,31 @@ namespace BlackDuckCMDTools
             return componentList;
 
             /// This is the method in which you Deserialize the reply json by listing object BlackDuckAPIComponentsListing
+            ///var componentsListing = JsonConvert.DeserializeObject<BlackDuckAPIComponentsListing>(componentsString);
+            ///var components = componentsListing.items;
+            ///return components;
 
-            //var componentsListing = JsonConvert.DeserializeObject<BlackDuckAPIComponentsListing>(componentsString);
-            //var components = componentsListing.items;
-            //return components;
+
         }
+
+        /// <summary>
+        /// This API is not realised yet
+        /// </summary>
+       
+      
+        //public string GetSourceTrees(string projectName, string versionName)
+        //{
+        //    string projectId = this.GetProjectIdFromName(projectName);
+        //    string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, versionName);
+        //    string fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/source-trees";
+        //    var acceptHeader = "application/json";
+
+        //    var content = new StringContent("");
+        //    string sourceTrees = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+        //    return sourceTrees;
+        //    
+        //}
 
 
         public string CreateProjectReturnProjectId(string projectJson)
@@ -200,7 +220,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string GetProjectVersionIdFromProjectNameAndVersionName(string projectName, string versionName) 
+        public string GetVersionIdFromProjectNameAndVersionName(string projectName, string versionName) 
         {
             var projectId = this.GetProjectIdFromName(projectName);
             var additinalSearchParams = "?q=versionName:" + versionName;
@@ -251,7 +271,7 @@ namespace BlackDuckCMDTools
             /// 
 
             string projectId = this.GetProjectIdFromName(projectName);
-            string versionId = this.GetProjectVersionIdFromProjectNameAndVersionName(projectName, versionName);
+            string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, versionName);
             
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/matched-files" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
