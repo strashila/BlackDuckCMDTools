@@ -41,7 +41,7 @@ namespace BlackDuckCMDTools
             this._authorizationBearerString = "Bearer " + _bearerToken;
         }
 
-        public BlackDuckRestAPI(string url, string token, string bdserverhash) //
+        public BlackDuckRestAPI(string url, string token, string bdServerHash) //
         {
             /// This is an overload constructor with server hash verification
             /// HTTPhandler is set to check specific server hash and validate by that hash
@@ -49,7 +49,7 @@ namespace BlackDuckCMDTools
 
             this._baseUrl = url;
             this._apiToken = token;
-            this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientCertificateValidationWithServerHash(bdserverhash);
+            this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientCertificateValidationWithServerHash(bdServerHash);
             this._bearerToken = this.CreateBearerToken();
             this._authorizationBearerString = "Bearer " + _bearerToken;
         }
@@ -71,10 +71,10 @@ namespace BlackDuckCMDTools
         }
 
 
-        public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectVersion(string projectname, string versionname, string additionalSearchParams)
+        public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectVersion(string projectName, string projectVersionName, string additionalSearchParams)
         {
-            var projectId = this.GetProjectIdFromName(projectname);
-            var versionId = this.GetVersionIdFromProjectNameAndVersionName(projectname, versionname);
+            var projectId = this.GetProjectIdFromName(projectName);
+            var versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, projectVersionName);
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
             var content = new StringContent("");
@@ -220,10 +220,10 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string GetVersionIdFromProjectNameAndVersionName(string projectName, string versionName) 
+        public string GetVersionIdFromProjectNameAndVersionName(string projectName, string projectVersionName) 
         {
             var projectId = this.GetProjectIdFromName(projectName);
-            var additinalSearchParams = "?q=versionName:" + versionName;
+            var additinalSearchParams = "?q=versionName:" + projectVersionName;
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions" + additinalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
             var content = new StringContent("");
@@ -263,15 +263,30 @@ namespace BlackDuckCMDTools
         }
 
 
+        public List<BlackDuckRole> GetRoles()
+        {
 
-        public List<BlackDuckMatchedFileWithComponent> GetBOMMatchedFilesWithComponent(string projectName, string versionName, string additionalSearchParams) 
+            var fullURL = this._baseUrl + "/api/roles";
+            var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
+            var content = new StringContent("");
+
+            string rolesJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject rolesListObject = JObject.Parse(rolesJson);
+            List<BlackDuckRole> rolesList = rolesListObject["items"].ToObject<List<BlackDuckRole>>();
+            return rolesList;
+        }
+
+
+
+        public List<BlackDuckMatchedFileWithComponent> GetBOMMatchedFilesWithComponent(string projectName, string projectVersionName, string additionalSearchParams) 
         {
 
             /// api-doc/public.html#matched-file-with-component-representation
             /// 
 
             string projectId = this.GetProjectIdFromName(projectName);
-            string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, versionName);
+            string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, projectVersionName);
             
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/matched-files" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
