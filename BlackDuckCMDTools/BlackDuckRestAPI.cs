@@ -135,6 +135,24 @@ namespace BlackDuckCMDTools
         }
 
 
+        public string DeleteProjectVersion(string projectName, string projectVersionName)
+        {
+            string projectId = this.GetProjectIdFromName(projectName);
+            string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, projectVersionName);
+
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId;
+            var acceptHeader = "";
+            var content = new StringContent("");
+
+            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Delete, acceptHeader, content).Result;
+            HttpStatusCode statusCode = responseMessage.StatusCode;
+            int statusCodeNum = (int)responseMessage.StatusCode;
+
+            // Creating a normal status code response ourselves
+            return statusCodeNum.ToString() + " " + statusCode.ToString();
+        }
+
+
         public string CreateProjectReturnHttpMessage(string projectJson)
         {
 
