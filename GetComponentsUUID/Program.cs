@@ -113,7 +113,7 @@ namespace GetComponentsUUID
                 try
                 {
                     // Getting the components
-                    components = bdapi.GetBOMComponentsFromProjectVersion(projectName, versionName, additionalSearchParams);
+                    components = bdapi.GetBOMComponentsFromProjectNameVersionName(projectName, versionName, additionalSearchParams);
                 }
                 catch (Newtonsoft.Json.JsonReaderException ex)
                 {

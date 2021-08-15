@@ -71,7 +71,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectVersion(string projectName, string projectVersionName, string additionalSearchParams)
+        public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectNameVersionName(string projectName, string projectVersionName, string additionalSearchParams)
         {
             var projectId = this.GetProjectIdFromName(projectName);
             var versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, projectVersionName);
@@ -97,25 +97,6 @@ namespace BlackDuckCMDTools
 
         }
 
-        /// <summary>
-        /// This API is not realised yet
-        /// </summary>
-       
-      
-        //public string GetSourceTrees(string projectName, string versionName)
-        //{
-        //    string projectId = this.GetProjectIdFromName(projectName);
-        //    string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, versionName);
-        //    string fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/source-trees";
-        //    var acceptHeader = "application/json";
-
-        //    var content = new StringContent("");
-        //    string sourceTrees = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
-
-        //    return sourceTrees;
-        //    
-        //}
-
 
         public string CreateProjectReturnProjectId(string projectJson)
         {
@@ -126,7 +107,7 @@ namespace BlackDuckCMDTools
 
             // Create Project APi does NOT return the result of HttpResponseMessage.
             // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
-            // Then you parse the Headers with Headers.GetValues and get the value of the location
+            // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created project ID, like "/projects/7cb65d55-1194-48e4-a3b0-a831d97253ee"
 
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
             string projectUrl = responseMessage.Headers.GetValues("Location").First();
@@ -148,7 +129,7 @@ namespace BlackDuckCMDTools
             HttpStatusCode statusCode = responseMessage.StatusCode;
             int statusCodeNum = (int)responseMessage.StatusCode;
 
-            // Creating a normal status code response ourselves
+            // Creating a readable status code response ourselves from HttpResponseMessage
             return statusCodeNum.ToString() + " " + statusCode.ToString();
         }
 
@@ -162,7 +143,25 @@ namespace BlackDuckCMDTools
 
             // Create Project APi does NOT return the result of HttpResponseMessage.
             // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
-            // Then you parse the Headers with Headers.GetValues and get the value of the location
+            // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created project ID /projects/7cb65d55-1194-48e4-a3b0-a831d97253ee
+
+
+            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
+            return responseMessage.ToString();
+        }
+
+
+        public string CreateVersionLicenseReport(string versionId, string reportJson)
+        {
+
+            var fullURL = this._baseUrl + "/api/versions/" + versionId + "/license-reports";
+            var acceptHeader = "application/vnd.blackducksoftware.report-4+json";
+            var content = new StringContent(reportJson, Encoding.UTF8, "application/vnd.blackducksoftware.report-4+json");
+
+            // POST request to this API does NOT return the result of HttpResponseMessage.
+            // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
+            // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created report ID: Location: /vulnerability-reports/{reportId}
+
 
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
             return responseMessage.ToString();
@@ -230,11 +229,48 @@ namespace BlackDuckCMDTools
         }
 
 
+        public List<BlackDuckProjectVersion> GetProjectVersionsFromProjectId(string projectId, string additinalSearchParams)
+        {
+
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions" + additinalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
+            var content = new StringContent("");
+
+            string projectsVersionsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject versionJObject = JObject.Parse(projectsVersionsString);
+            List<BlackDuckProjectVersion> versionList = versionJObject["items"].ToObject<List<BlackDuckProjectVersion>>();
+
+            return versionList;
+        }
+
+
+        public List<BlackDuckBOMComponent> GetComponentsFromProjectIdVersionId(string projectId, string versionId, string additinalSearchParams)
+        {
+
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components" + additinalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
+            var content = new StringContent("");
+
+            string componentsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject componentsJObject = JObject.Parse(componentsString);
+            List<BlackDuckBOMComponent> componentsList = componentsJObject["items"].ToObject<List<BlackDuckBOMComponent>>();
+
+            return componentsList;
+        }
+
+
         public string GetProjectIdFromProjectObject(BlackDuckProject proj)
         {
             string projectURL = proj._meta.href;
             return projectURL.Split('/').Last();
+        }
 
+        public string GetVersionIdFromVersionObject(BlackDuckProjectVersion version)
+        {
+            string versionUrl = version._meta.href;
+            return versionUrl.Split('/').Last();
         }
 
 
@@ -266,19 +302,7 @@ namespace BlackDuckCMDTools
 
 
 
-        public List<BlackDuckProjectVersion> GetProjectVersionsFromProjectId(string projectId, string additinalSearchParams)
-        {
 
-            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions" + additinalSearchParams;
-            var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
-            var content = new StringContent("");
-
-            string projectsVersionsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
-
-            List<BlackDuckProjectVersion> projectsVersions = JsonConvert.DeserializeObject<BlackDuckAPIProjectVersionsListing>(projectsVersionsString).items;
-
-            return projectsVersions;
-        }
 
 
         public List<BlackDuckRole> GetRoles()
