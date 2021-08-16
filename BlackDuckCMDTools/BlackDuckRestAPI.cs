@@ -93,8 +93,6 @@ namespace BlackDuckCMDTools
             ///var componentsListing = JsonConvert.DeserializeObject<BlackDuckAPIComponentsListing>(componentsString);
             ///var components = componentsListing.items;
             ///return components;
-
-
         }
 
 
@@ -267,12 +265,6 @@ namespace BlackDuckCMDTools
             return projectURL.Split('/').Last();
         }
 
-        public string GetVersionIdFromVersionObject(BlackDuckProjectVersion version)
-        {
-            string versionUrl = version._meta.href;
-            return versionUrl.Split('/').Last();
-        }
-
 
         public string GetVersionIdFromProjectNameAndVersionName(string projectName, string projectVersionName) 
         {
@@ -307,7 +299,6 @@ namespace BlackDuckCMDTools
 
         public List<BlackDuckRole> GetRoles()
         {
-
             var fullURL = this._baseUrl + "/api/roles";
             var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
             var content = new StringContent("");
@@ -342,7 +333,6 @@ namespace BlackDuckCMDTools
             {
                 return matchedFilesListingJobject["items"].ToObject<List<BlackDuckMatchedFileWithComponent>>(); 
             }
-
             else return null;
         }
 
