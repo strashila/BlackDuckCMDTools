@@ -337,6 +337,19 @@ namespace BlackDuckCMDTools
         }
 
 
+        public string GetSourceTrees(string projectName, string versionName)
+        {
+            string projectId = this.GetProjectIdFromName(projectName);
+            string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, versionName);
+            string fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/source-trees";
+            var acceptHeader = "";
+
+            var content = new StringContent("");
+            string sourceTrees = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            return sourceTrees;
+        }
+
         public string ParseComponentId (string component)
 
         {

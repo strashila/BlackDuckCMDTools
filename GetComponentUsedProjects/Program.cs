@@ -121,63 +121,70 @@ namespace GetComponentsUUID
                     }
                 }
 
-
-                List<BlackDuckProject> allProjects = bdapi.GetAllProjects(additionalSearchParams);
-
-
-                foreach (BlackDuckProject project in allProjects)
+                try
                 {
-                    string projectId = project._meta.href.Split('/').Last();
-                    List<BlackDuckProjectVersion> versions;
-                    try
-                    {
-                        versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
-                    }
-                    catch (Exception ex)
-                    {
-                        versions = null;
-                    }
+                    List<BlackDuckProject> allProjects = bdapi.GetAllProjects(additionalSearchParams);
 
-                    if (versions != null)
+                    foreach (BlackDuckProject project in allProjects)
                     {
-                        foreach (var version in versions)
+                        string projectId = project._meta.href.Split('/').Last();
+                        List<BlackDuckProjectVersion> versions;
+                        try
                         {
-                            List<BlackDuckBOMComponent> components;
-                            var versionId = version._meta.href.Split('/').Last();
-                            try
-                            {
-                                components = bdapi.GetComponentsFromProjectIdVersionId(projectId, versionId, additionalSearchParams);
+                            versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
+                        }
+                        catch (Exception ex)
+                        {
+                            versions = null;
+                        }
 
-                            }
-                            catch (Exception ex)
+                        if (versions != null)
+                        {
+                            foreach (var version in versions)
                             {
-                                components = null;
-                            }
-
-                            if (components != null)
-                            {
-                                foreach (var singleComponent in components)
+                                List<BlackDuckBOMComponent> components;
+                                var versionId = version._meta.href.Split('/').Last();
+                                try
                                 {
-                                    var name = singleComponent.componentName.ToLower();
-                                    if (name.Contains(component.ToLower()))
+                                    components = bdapi.GetComponentsFromProjectIdVersionId(projectId, versionId, additionalSearchParams);
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    components = null;
+                                }
+
+                                if (components != null)
+                                {
+                                    foreach (var singleComponent in components)
                                     {
-                                        string logString = singleComponent.componentName + "|" + project.name + "|" + version.versionName;
-
-                                        if (filePath != "")
+                                        var name = singleComponent.componentName.ToLower();
+                                        if (name.Contains(component.ToLower()))
                                         {
-                                            Logger.Log(filePath, logString);
+                                            string logString = singleComponent.componentName + "|" + project.name + "|" + version.versionName;
 
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine(logString);
+                                            if (filePath != "")
+                                            {
+                                                Logger.Log(filePath, logString);
+
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine(logString);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message + " Please verify that you have correct BDurl and token " );
+                }
+
 
 
                 Console.WriteLine($"\nFinished logging to file {filePath}");
