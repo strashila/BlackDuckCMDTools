@@ -101,7 +101,7 @@ namespace GetComponentsUUID
 
 
 
-                var columnString = "ComponentName;ProjectName;Version";
+                var columnString = "ComponentName|ProjectName|Version";
 
                 if (filePath != "")
                 {
@@ -161,7 +161,7 @@ namespace GetComponentsUUID
                                     var name = singleComponent.componentName.ToLower();
                                     if (name.Contains(component.ToLower()))
                                     {
-                                        string logString = singleComponent.componentName + ";" + project.name + ";" + version.versionName;
+                                        string logString = singleComponent.componentName + "|" + project.name + "|" + version.versionName;
 
                                         if (filePath != "")
                                         {
