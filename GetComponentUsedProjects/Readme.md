@@ -1,4 +1,4 @@
-GetComponentUsedProjects gets the list of all the projects and project version where a component name is used
+GetComponentUsedProjects gets the list of all the Projects and Project Versions where a component name is used  
 Usage: GetComponentUsedProjects [options]
 
 Options:
