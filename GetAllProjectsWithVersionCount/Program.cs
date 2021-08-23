@@ -45,6 +45,12 @@ namespace GetAllProjectsWithVersionCount
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
                 List<BlackDuckProject> projects;
 
+
+                if (bdUrl.LastIndexOf("/") == bdUrl.Length - 1) // URL ends with "/"
+                {
+                    bdUrl = bdUrl.Remove(bdUrl.LastIndexOf("/"));
+                }
+
                 var additionalSearchParams = "?offset=0&limit=500";
 
                 if (token == "" || bdUrl == "")
@@ -98,10 +104,10 @@ namespace GetAllProjectsWithVersionCount
                 {
                     projects = bdapi.GetAllProjects(additionalSearchParams);
                 }
-                catch (Newtonsoft.Json.JsonReaderException ex)
+                catch (Exception ex)
                 {
                     // Catching Serialization errors
-                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Token with appropriate permissions");
+                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl and token ");
                     return;
                 }
 

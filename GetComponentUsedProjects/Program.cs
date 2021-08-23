@@ -34,7 +34,7 @@ namespace GetComponentsUUID
             filePath.Description = "Output filepath. If not present in options, the tool will print the output to console";
 
             var notSecure = new Option<bool>("--not-secure");
-            //secureConnection.SetDefaultValue(false);
+            
             notSecure.Description = "Disable secure connection to BlackDuck server";
 
 
@@ -51,7 +51,12 @@ namespace GetComponentsUUID
             rootCommand.Handler = CommandHandler.Create<string, string, string, string, bool>((bdUrl, token, component, filePath, notSecure) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
-                //List<BlackDuckBOMComponent> components;
+
+
+                if (bdUrl.LastIndexOf("/") == bdUrl.Length - 1) // URL ends with "/"
+                {
+                    bdUrl = bdUrl.Remove(bdUrl.LastIndexOf("/"));
+                }
 
                 var additionalSearchParams = "?offset=0&limit=500";
 
