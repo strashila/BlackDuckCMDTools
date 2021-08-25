@@ -101,7 +101,7 @@ namespace GetAllProjectsWithVersionCount
                     }
                 }
 
-                var columnString = "CodeLocation_name|Mapped_project_version";
+                var columnString = "CodeLocation_name|Mapped_project_version|Scan_size";
                 if (filePath != "")
                 {
                     try
@@ -130,7 +130,7 @@ namespace GetAllProjectsWithVersionCount
                         if (codelocation.mappedProjectVersion == null)
                         {
                             codelocation.mappedProjectVersion = "NOTMAPPED";
-                            var logString = $"{codelocation.name} | {codelocation.mappedProjectVersion}";
+                            var logString = $"{codelocation.name} | {codelocation.mappedProjectVersion} | {codelocation.scanSize}";
                             if (filePath != "")
                             {
                                 Logger.Log(filePath, logString);
