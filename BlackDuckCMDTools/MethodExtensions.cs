@@ -29,7 +29,6 @@ namespace BlackDuckCMDTools
             var responseContent = response.Content.ReadAsStringAsync().Result;
 
             return responseContent;
-
         }
 
 

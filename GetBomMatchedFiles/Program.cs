@@ -60,17 +60,20 @@ namespace GetBomMatchedFiles
                 List<BlackDuckMatchedFileWithComponent> matchedFiles;
 
 
-                if (bdUrl.LastIndexOf("/") == bdUrl.Length - 1) // URL ends with "/"
-                {
-                    bdUrl = bdUrl.Remove(bdUrl.LastIndexOf("/"));
-                }
-
                 var additionalSearchParams = "?offset=0&limit=500";
 
                 if (token == "" || bdUrl == "" || projectName == "")
                 {
                     Console.WriteLine("Parameters missing, use --help");
                     return;
+                }
+
+                else
+                {
+                    if (bdUrl.LastIndexOf("/") == bdUrl.Length - 1) // URL ends with "/"
+                    {
+                        bdUrl = bdUrl.Remove(bdUrl.LastIndexOf("/"));
+                    }
                 }
 
                 if (notSecure)

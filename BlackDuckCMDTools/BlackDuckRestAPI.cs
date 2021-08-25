@@ -124,11 +124,9 @@ namespace BlackDuckCMDTools
             var content = new StringContent("");
 
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Delete, acceptHeader, content).Result;
-            HttpStatusCode statusCode = responseMessage.StatusCode;
-            int statusCodeNum = (int)responseMessage.StatusCode;
 
-            // Creating a readable status code response ourselves from HttpResponseMessage
-            return statusCodeNum.ToString() + " " + statusCode.ToString();
+            // Creating a readable status code response ourselves from HttpResponseMessage. Casting int to get status code number, like "204", and the StatusCode is "No Content"
+            return ((int)responseMessage.StatusCode).ToString() + " " + responseMessage.StatusCode.ToString();
         }
 
 
@@ -225,6 +223,20 @@ namespace BlackDuckCMDTools
             List<BlackDuckProject> projectList = projectJObject["items"].ToObject<List<BlackDuckProject>>();
             return projectList;
         }
+
+
+        public List<BlackDuckCodeLocation> GetAllCodeLocations(string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/codelocations" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
+            var content = new StringContent("");
+            string codeLocationsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject codeLocationsJObject = JObject.Parse(codeLocationsString);
+            List<BlackDuckCodeLocation> codeLocationsList = codeLocationsJObject["items"].ToObject<List<BlackDuckCodeLocation>>();
+            return codeLocationsList;
+        }
+
 
 
         public List<BlackDuckProjectVersion> GetProjectVersionsFromProjectId(string projectId, string additinalSearchParams)

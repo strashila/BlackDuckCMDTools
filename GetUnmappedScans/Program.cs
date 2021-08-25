@@ -7,7 +7,7 @@ using System.Net.Http;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
 
-namespace GetComponentsUUID
+namespace GetAllProjectsWithVersionCount
 {
     class Program
     {
@@ -17,52 +17,36 @@ namespace GetComponentsUUID
             /// Uses the beta System.CommandLine library to parse command line arguments 
             /// https://github.com/dotnet/command-line-api/blob/main/docs/Your-first-app-with-System-CommandLine.md
 
+
             var bdUrl = new Option<string>("--bdurl");
             bdUrl.Description = "REQUIRED: BlackDuck URL";
 
             var token = new Option<string>("--token");
             token.Description = "REQUIRED: BD Token";
 
-
-            var projectName = new Option<string>("--projectname");
-            projectName.Description = "REQUIRED: Project name";
-
-            var versioNname = new Option<string>("--versionname");
-            versioNname.Description = "REQUIRED: Version name";
-
             var notSecure = new Option<bool>("--not-secure");
             //secureConnection.SetDefaultValue(false);
             notSecure.Description = "Disable secure connection to BlackDuck server";
-
 
             var filePath = new Option<string>("--filepath");
             filePath.AddAlias("-f");
             filePath.Description = "Output filepath. If not present in options, the tool will print the output to console";
 
-
-            var filter = new Option<string>("--filter");
-            filter.Description = "Supported Filters: see list here: /api-doc/public.html#_listing_bom_components";
-
             var rootCommand = new RootCommand
             {
                 bdUrl,
-                token,                
-                projectName,
-                versioNname,
+                token,
                 notSecure,
                 filePath,
-                filter
             };
 
-            rootCommand.Handler = CommandHandler.Create<string, string, string, string, bool, string, string>((bdUrl, token, projectName, versionName, notSecure, filePath, filter) =>
+            rootCommand.Handler = CommandHandler.Create<string, string, bool, string>((bdUrl, token, notSecure, filePath) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
-                List<BlackDuckBOMComponent> components;
 
+                var additionalSearchParams = "?offset=0&limit=5000";
 
-                var additionalSearchParams = "?offset=0&limit=500";
-
-                if (token == "" || bdUrl == "" || projectName == "")
+                if (token == "" || bdUrl == "")
                 {
                     Console.WriteLine("Parameters missing, use --help");
                     return;
@@ -75,6 +59,10 @@ namespace GetComponentsUUID
                         bdUrl = bdUrl.Remove(bdUrl.LastIndexOf("/"));
                     }
                 }
+
+
+                /// Trying to create connection to the API both secure and not-secure methods (trusting all SSL certificates or not).
+                /// Catching errors both times
 
                 if (notSecure)
                 {
@@ -113,27 +101,7 @@ namespace GetComponentsUUID
                     }
                 }
 
-                if (filter != "")
-                {
-                    additionalSearchParams += "&" + filter;
-                }
-
-
-                try
-                {
-                    // Getting the components
-                    components = bdapi.GetBOMComponentsFromProjectNameVersionName(projectName, versionName, additionalSearchParams);
-                }
-                catch (Newtonsoft.Json.JsonReaderException ex)
-                {
-                    // Catching Serialization errors
-                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Bearer Token with appropriate permissions");
-                    return;
-                }
-
-
-                var columnString = "ComponentName;UUID";
-
+                var columnString = "CodeLocation_name|Mapped_project_version";
                 if (filePath != "")
                 {
                     try
@@ -150,28 +118,39 @@ namespace GetComponentsUUID
                             return;
                         }
                     }
-
-
                 }
 
 
-                foreach (BlackDuckBOMComponent component in components)
+                try
+                {                    
+                    var codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
+
+                    foreach (var codelocation in codeLocations)
+                    {
+                        if (codelocation.mappedProjectVersion == null)
+                        {
+                            codelocation.mappedProjectVersion = "NOTMAPPED";
+                            var logString = $"{codelocation.name} | {codelocation.mappedProjectVersion}";
+                            if (filePath != "")
+                            {
+                                Logger.Log(filePath, logString);
+                            }
+                            else
+                            {
+                                Console.WriteLine(logString);
+                            }                            
+                        } 
+                    }                            
+
+
+                }
+                catch (Exception ex)
                 {
-                    string uuid = bdapi.ParseComponentId(component.component);
-
-                    string logString = component.componentName + ";" + uuid;
-
-                    if (filePath != "")
-                    {
-                        Logger.Log(filePath, logString);
-
-                    }
-                    else
-                    {
-                        Console.WriteLine(logString);
-                    }
+                    // Catching Serialization errors
+                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl and token ");
+                    return;
                 }
-                Console.WriteLine($"\nFinished logging to file {filePath}");
+
             });
 
             // Parse the incoming args and invoke the handler

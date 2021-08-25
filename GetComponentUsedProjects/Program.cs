@@ -53,10 +53,7 @@ namespace GetComponentsUUID
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
 
-                if (bdUrl.LastIndexOf("/") == bdUrl.Length - 1) // URL ends with "/"
-                {
-                    bdUrl = bdUrl.Remove(bdUrl.LastIndexOf("/"));
-                }
+
 
                 var additionalSearchParams = "?offset=0&limit=500";
 
@@ -64,6 +61,14 @@ namespace GetComponentsUUID
                 {
                     Console.WriteLine("Parameters missing, use --help");
                     return;
+                }
+
+                else
+                {
+                    if (bdUrl.LastIndexOf("/") == bdUrl.Length - 1) // URL ends with "/"
+                    {
+                        bdUrl = bdUrl.Remove(bdUrl.LastIndexOf("/"));
+                    }
                 }
 
                 if (notSecure)
@@ -183,14 +188,11 @@ namespace GetComponentsUUID
                             }
                         }
                     }
-
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Error: " + ex.Message + " Please verify that you have correct BDurl and token " );
                 }
-
-
 
                 Console.WriteLine($"\nFinished logging to file {filePath}");
             });
