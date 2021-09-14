@@ -71,6 +71,12 @@ namespace BlackDuckCMDTools
         }
 
 
+        public void RefreshBearerToken()
+        {
+            this._bearerToken = this.CreateBearerToken();
+        }
+
+
         public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectNameVersionName(string projectName, string projectVersionName, string additionalSearchParams)
         {
             var projectId = this.GetProjectIdFromName(projectName);
@@ -192,21 +198,22 @@ namespace BlackDuckCMDTools
             var content = new StringContent("");
 
             string projectsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+            
+            JObject projectJObject = JObject.Parse(projectsString);
 
-            BlackDuckAPIProjectsListing projectsListing = JsonConvert.DeserializeObject<BlackDuckAPIProjectsListing>(projectsString);
+            List<BlackDuckProject> projectList = projectJObject["items"].ToObject<List<BlackDuckProject>>();
 
-            if (projectsListing.totalCount == 0)
-            {
-                //if no project found we're returning the whole reply string
+            if (projectList.Count != 1)  //no projects or more than one projects
+            {               
                 return projectsString; 
             }
 
             else
             {
                 // First project in the list, should be the only one
-                BlackDuckProject project = projectsListing.items[0];
+                BlackDuckProject project = projectList[0];
 
-                string projectId = GetProjectIdFromProjectObject(project);
+                string projectId = project._meta.href.Split('/').Last();
                 return projectId;
 
             }
@@ -288,18 +295,18 @@ namespace BlackDuckCMDTools
 
             string projectsVersionsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
-            BlackDuckAPIProjectVersionsListing projectsVersionListing = JsonConvert.DeserializeObject<BlackDuckAPIProjectVersionsListing>(projectsVersionsString);
+            JObject versionJObject = JObject.Parse(projectsVersionsString);
+            List<BlackDuckProjectVersion> versionList = versionJObject["items"].ToObject<List<BlackDuckProjectVersion>>();
 
-            if (projectsVersionListing.totalCount == 0)
+            if (versionList.Count == 0)
             {
                 return projectsVersionsString; 
             }
                   
             else
             {
-                BlackDuckProjectVersion version = projectsVersionListing.items[0]; 
-                string versionURL = version._meta.href;
-                string versionID = versionURL.Split('/').Last();
+                BlackDuckProjectVersion version = versionList[0];
+                string versionID = version._meta.href.Split('/').Last();
                 return versionID;
             }
         }
