@@ -279,10 +279,6 @@ namespace BlackDuckCMDTools
 
             BlackDuckProject project = JsonConvert.DeserializeObject<BlackDuckProject>(codeLocationsString);
 
-            //JObject codeLocationsJObject = JObject.Parse(codeLocationsString);
-            //List<BlackDuckCodeLocation> codeLocationsList = codeLocationsJObject["items"].ToObject<List<BlackDuckCodeLocation>>();
-            //return codeLocationsList;
-
             return project.name;
         }
 
