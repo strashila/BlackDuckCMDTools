@@ -108,6 +108,14 @@ namespace BlackDuckCMDTools
             string projectId = this.GetProjectIdFromName(projectName);
             string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, projectVersionName);
 
+            return this.DeleteProjectVersionByProjectIdVersionId(projectId, versionId);
+
+
+        }
+
+        public string DeleteProjectVersionByProjectIdVersionId(string projectId, string versionId)
+        {
+
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId;
             var acceptHeader = "";
             var content = new StringContent("");
@@ -117,6 +125,21 @@ namespace BlackDuckCMDTools
             // Creating a readable status code response ourselves from HttpResponseMessage. Casting int to get status code number, like "204", and the StatusCode is "No Content"
             return ((int)responseMessage.StatusCode).ToString() + " " + responseMessage.StatusCode.ToString();
         }
+
+
+        public string DeleteProjectByProjectId(string projectId)
+        {
+
+            var fullURL = this._baseUrl + "/api/projects/" + projectId;
+            var acceptHeader = "";
+            var content = new StringContent("");
+
+            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Delete, acceptHeader, content).Result;
+
+            // Creating a readable status code response ourselves from HttpResponseMessage. Casting int to get status code number, like "204", and the StatusCode is "No Content"
+            return ((int)responseMessage.StatusCode).ToString() + " " + responseMessage.StatusCode.ToString();
+        }
+
 
 
         public string CreateProjectReturnHttpMessage(string projectJson)
@@ -244,6 +267,23 @@ namespace BlackDuckCMDTools
             JObject codeLocationsJObject = JObject.Parse(codeLocationsString);
             List<BlackDuckCodeLocation> codeLocationsList = codeLocationsJObject["items"].ToObject<List<BlackDuckCodeLocation>>();
             return codeLocationsList;
+        }
+
+
+        public string GetProjectNameByID(string projectId)
+        {
+            var fullURL = this._baseUrl + "/api/projects/" + projectId;
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-4+json";
+            var content = new StringContent("");
+            string codeLocationsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            BlackDuckProject project = JsonConvert.DeserializeObject<BlackDuckProject>(codeLocationsString);
+
+            //JObject codeLocationsJObject = JObject.Parse(codeLocationsString);
+            //List<BlackDuckCodeLocation> codeLocationsList = codeLocationsJObject["items"].ToObject<List<BlackDuckCodeLocation>>();
+            //return codeLocationsList;
+
+            return project.name;
         }
 
 
