@@ -130,7 +130,7 @@ namespace GetAllProjectsWithVersionCount
                     {
                         if (codelocation.mappedProjectVersion == null)
                         {
-                            codelocation.mappedProjectVersion = "NOTMAPPED";
+                            codelocation.mappedProjectVersion = "UNMAPPED";
                         }
 
                         else
