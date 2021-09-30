@@ -102,25 +102,8 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string CreateProjectReturnProjectId(string projectJson)
-        {
 
-            var fullURL = this._baseUrl + "/api/projects";
-            var acceptHeader = "application/vnd.blackducksoftware.project-detail-4+json";
-            var content = new StringContent(projectJson, Encoding.UTF8, "application/vnd.blackducksoftware.project-detail-4+json");
-
-            // Create Project APi does NOT return the result of HttpResponseMessage.
-            // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
-            // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created project ID, like "/projects/7cb65d55-1194-48e4-a3b0-a831d97253ee"
-
-            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
-            string projectUrl = responseMessage.Headers.GetValues("Location").First();
-            string projectId = projectUrl.Split('/').Last();
-            return projectId;
-        }
-
-
-        public string DeleteProjectVersion(string projectName, string projectVersionName)
+        public string DeleteProjectVersionByVersionName(string projectName, string projectVersionName)
         {
             string projectId = this.GetProjectIdFromName(projectName);
             string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, projectVersionName);
@@ -151,6 +134,25 @@ namespace BlackDuckCMDTools
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
             return responseMessage.ToString();
         }
+
+
+        public string CreateProjectReturnProjectId(string projectJson)
+        {
+
+            var fullURL = this._baseUrl + "/api/projects";
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-4+json";
+            var content = new StringContent(projectJson, Encoding.UTF8, "application/vnd.blackducksoftware.project-detail-4+json");
+
+            // Create Project APi does NOT return the result of HttpResponseMessage.
+            // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
+            // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created project ID, like "/projects/7cb65d55-1194-48e4-a3b0-a831d97253ee"
+
+            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
+            string projectUrl = responseMessage.Headers.GetValues("Location").First();
+            string projectId = projectUrl.Split('/').Last();
+            return projectId;
+        }
+
 
 
         public string CreateVersionLicenseReport(string versionId, string reportJson)
