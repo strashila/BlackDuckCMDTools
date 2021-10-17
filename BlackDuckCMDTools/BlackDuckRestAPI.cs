@@ -140,6 +140,19 @@ namespace BlackDuckCMDTools
             return ((int)responseMessage.StatusCode).ToString() + " " + responseMessage.StatusCode.ToString();
         }
 
+        public string DeleteCodelocation(string codelocationId)
+        {
+
+            var fullURL = this._baseUrl + "/api/codelocations/" + codelocationId;
+            var acceptHeader = "";
+            var content = new StringContent("");
+
+            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Delete, acceptHeader, content).Result;
+
+            // Creating a readable status code response ourselves from HttpResponseMessage. Casting int to get status code number, like "204", and the StatusCode is "No Content"
+            return ((int)responseMessage.StatusCode).ToString() + " " + responseMessage.StatusCode.ToString();
+        }
+
 
 
         public string CreateProjectReturnHttpMessage(string projectJson)
@@ -275,11 +288,24 @@ namespace BlackDuckCMDTools
             var fullURL = this._baseUrl + "/api/projects/" + projectId;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-4+json";
             var content = new StringContent("");
-            string codeLocationsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+            string projectString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
-            BlackDuckProject project = JsonConvert.DeserializeObject<BlackDuckProject>(codeLocationsString);
+            BlackDuckProject project = JsonConvert.DeserializeObject<BlackDuckProject>(projectString);
 
             return project.name;
+        }
+
+
+        public string GetVersionNameByID(string projectId, string versionId)
+        {
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId;
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
+            var content = new StringContent("");
+            string versionString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            BlackDuckProjectVersion version = JsonConvert.DeserializeObject<BlackDuckProjectVersion>(versionString);
+
+            return version.versionName;
         }
 
 
@@ -300,7 +326,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public List<BlackDuckBOMComponent> GetComponentsFromProjectIdVersionId(string projectId, string versionId, string additinalSearchParams)
+        public List<BlackDuckBOMComponent> ListingBomComponents(string projectId, string versionId, string additinalSearchParams)
         {
 
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components" + additinalSearchParams;

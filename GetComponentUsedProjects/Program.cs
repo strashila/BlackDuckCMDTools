@@ -156,7 +156,7 @@ namespace GetComponentsUUID
                                 var versionId = version._meta.href.Split('/').Last();
                                 try
                                 {
-                                    components = bdapi.GetComponentsFromProjectIdVersionId(projectId, versionId, additionalSearchParams);
+                                    components = bdapi.ListingBomComponents(projectId, versionId, additionalSearchParams);
 
                                 }
                                 catch (Exception ex)
