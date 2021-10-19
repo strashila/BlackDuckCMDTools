@@ -102,29 +102,61 @@ namespace GetAllProjectsWithVersionCount
 
                 try
                 {
-                    var codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
-
-                    Console.WriteLine("Warning - you are about to delete all the unmapped codelocations (scans) for your instance. To proceed type Yes");
+                    Console.WriteLine("Warning - you are about to delete all versions with no scans associated with them from your instance. To continue type \"Yes\"");
                     string concent = Console.ReadLine();
                     if (concent.ToLower() != "yes")
                     {
                         return;
                     }
-                    Console.WriteLine("Deleting codelocations...");
-                    var emptyCodelocations = 0;
 
-                    foreach (var codelocation in codeLocations)
+                    Console.WriteLine("Getting projects...");
+                    var projects = bdapi.GetAllProjects(additionalSearchParams);
+                    var allVersionsList = new List<(string, string)>();
+
+                    foreach (var project in projects)
                     {
-                        if (codelocation.mappedProjectVersion == null)
+                        var projectId = project._meta.href.Split('/').Last();
+                        var versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
+                        foreach (var version in versions)
                         {
-                            //codelocation.mappedProjectVersion = "UNMAPPED";
-                            var codeLocationId = codelocation._meta.href.Split("/").Last();
-                            
-                            Console.WriteLine($"Deleting codeLocation {codeLocationId} {bdapi.DeleteCodelocation(codeLocationId)}");
-                            emptyCodelocations++;
-                        }                        
+                            var versionId = version._meta.href.Split('/').Last();
+                            (string, string) projectVersionComboTuple = (projectId, versionId);
+                            allVersionsList.Add(projectVersionComboTuple);
+                        }
                     }
-                    Console.WriteLine($"{emptyCodelocations} unmapped codelocations deleted");
+
+                    Console.WriteLine("Getting scans...");
+                    var codelocations = bdapi.GetAllCodeLocations(additionalSearchParams);
+                    foreach (var codelocation in codelocations)
+                    {
+                        if (codelocation.mappedProjectVersion != null)
+                        {
+
+                            var str = codelocation.mappedProjectVersion.Split('/');
+                            var projectId = str[str.Length - 3];
+                            var versionId = str.Last();
+                            var mappedVersionTuple = (projectId, versionId);
+                            allVersionsList.Remove(mappedVersionTuple);
+                        }
+                    }
+
+                    Console.WriteLine("Deleting versions with 0 scans...");
+
+                    foreach (var emptyVersionCombo in allVersionsList)
+                    {
+                        var projectId = emptyVersionCombo.Item1;
+                        var versionId = emptyVersionCombo.Item2;
+
+                        Console.WriteLine($"Project {bdapi.GetProjectNameByID(projectId)} version {bdapi.GetVersionNameByID(projectId, versionId)} deleted", bdapi.DeleteProjectVersionByProjectIdVersionId(projectId, versionId));
+
+                        var versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
+                        if (versions.Count == 1 && versions[0].versionName == "unnamed")
+                        {
+
+                            Console.WriteLine($"Project {bdapi.GetProjectNameByID(projectId)} was deleted because it had 0 versions", bdapi.DeleteProjectByProjectId(projectId));
+                        }
+
+                    }
                 }
 
                 catch (Exception ex)
@@ -133,10 +165,10 @@ namespace GetAllProjectsWithVersionCount
                     Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl and token ");
                     return;
                 }
-                
+
             });
 
-            
+
 
             // Parse the incoming args and invoke the handler
             return rootCommand.InvokeAsync(args).Result;
