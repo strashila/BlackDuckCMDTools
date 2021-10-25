@@ -16,5 +16,6 @@ namespace BlackDuckCMDTools
         public DateTime updatedAt;
         public string mappedProjectVersion;
         public BlackDuckAPI_meta _meta;
+
     }
 }

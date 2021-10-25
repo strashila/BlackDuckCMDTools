@@ -41,7 +41,7 @@ namespace GetAllProjectsWithVersionCount
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
-                var additionalSearchParams = "?offset=0&limit=5000";
+                var additionalSearchParams = "?offset=0&limit=10000";
 
                 if (token == "" || bdUrl == "")
                 {
@@ -120,7 +120,7 @@ namespace GetAllProjectsWithVersionCount
                             //codelocation.mappedProjectVersion = "UNMAPPED";
                             var codeLocationId = codelocation._meta.href.Split("/").Last();
                             
-                            Console.WriteLine($"Deleting codeLocation {codeLocationId} {bdapi.DeleteCodelocation(codeLocationId)}");
+                            Console.WriteLine($"Deleting codeLocation {codelocation._meta.href} {bdapi.DeleteCodelocation(codeLocationId)}");
                             emptyCodelocations++;
                         }                        
                     }

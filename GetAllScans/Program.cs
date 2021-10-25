@@ -126,19 +126,24 @@ namespace GetAllProjectsWithVersionCount
                 {
                     var codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
 
+                    var unmappedScansCounter = 0;
+
                     foreach (var codelocation in codeLocations)
                     {
+                        var mappedVersion = "";
                         if (codelocation.mappedProjectVersion == null)
                         {
-                            codelocation.mappedProjectVersion = "UNMAPPED";
+                            mappedVersion = "UNMAPPED";
+                            unmappedScansCounter++;
                         }
 
                         else
                         {
-                            codelocation.mappedProjectVersion = codelocation.mappedProjectVersion.Split('/').Last();
+                            mappedVersion = codelocation.mappedProjectVersion;
+
                         }
 
-                        var logString = $"{codelocation.name} | {codelocation.mappedProjectVersion} | {codelocation.scanSize}";
+                        var logString = $"{codelocation.name} | {mappedVersion} | {codelocation.scanSize}";
                         if (filePath != "")
                         {
                             Logger.Log(filePath, logString);
@@ -148,6 +153,10 @@ namespace GetAllProjectsWithVersionCount
                             Console.WriteLine(logString);
                         }
                     }
+
+                    Console.WriteLine();
+                    Console.WriteLine($"There are {unmappedScansCounter} unmapped scans");
+                    Console.WriteLine();
                 }
 
                 catch (Exception ex)

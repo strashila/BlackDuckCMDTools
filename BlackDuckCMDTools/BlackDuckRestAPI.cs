@@ -283,6 +283,18 @@ namespace BlackDuckCMDTools
         }
 
 
+        public string GeCodeLocationsReturnHTTPResponse(string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/codelocations" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
+            var content = new StringContent("");
+            HttpResponseMessage codeLocationsMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            return codeLocationsMessage.ToString();
+
+    
+        }
+
         public string GetProjectNameByID(string projectId)
         {
             var fullURL = this._baseUrl + "/api/projects/" + projectId;
