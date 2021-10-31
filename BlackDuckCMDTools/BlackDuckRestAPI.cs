@@ -308,6 +308,17 @@ namespace BlackDuckCMDTools
         }
 
 
+        public string GetComponentsJson(string projectId, string versionId, string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components/" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
+            var content = new StringContent("");
+            string componentString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            return componentString;
+        }
+
+
         public string GetVersionNameByID(string projectId, string versionId)
         {
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId;
