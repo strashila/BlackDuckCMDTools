@@ -191,7 +191,7 @@ namespace GetComponentsUUID
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error: " + ex.Message + " Please verify that you have correct BDurl and token " );
+                    Console.WriteLine($"Error: {ex.Message} Please verify that you have correct BDurl and token" );
                 }
 
                 Console.WriteLine($"\nFinished logging to file {filePath}");
