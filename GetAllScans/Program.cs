@@ -43,9 +43,13 @@ namespace GetAllProjectsWithVersionCount
 
             rootCommand.Handler = CommandHandler.Create<string, string, bool, string>((bdUrl, token, notSecure, filePath) =>
             {
+                var start = DateTime.Now;
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
-                var additionalSearchParams = "?offset=0&limit=5000";
+                var offset = 0;
+                var limit = 1000;
+
+                var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
                 if (token == "" || bdUrl == "")
                 {
@@ -125,37 +129,50 @@ namespace GetAllProjectsWithVersionCount
                 try
                 {
                     var codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
-
+                    var mappedScansCounter = 0;
                     var unmappedScansCounter = 0;
 
-                    foreach (var codelocation in codeLocations)
+
+                    while (codeLocations.Count > 0)
                     {
-                        var mappedVersion = "";
-                        if (codelocation.mappedProjectVersion == null)
+                        
+                        foreach (var codelocation in codeLocations)
                         {
-                            mappedVersion = "UNMAPPED";
-                            unmappedScansCounter++;
+                            var mappedVersion = "";
+                            if (codelocation.mappedProjectVersion == null)
+                            {
+                                mappedVersion = "UNMAPPED";
+                                unmappedScansCounter++;
+                            }
+
+                            else
+                            {
+                                mappedVersion = codelocation.mappedProjectVersion;
+                                mappedScansCounter++;
+
+                            }
+
+                            var logString = $"{codelocation.name} | {mappedVersion} | {codelocation.scanSize}";
+                            if (filePath != "")
+                            {
+                                Logger.Log(filePath, logString);
+                            }
+                            else
+                            {
+                                Console.WriteLine(logString);
+                            }
                         }
 
-                        else
-                        {
-                            mappedVersion = codelocation.mappedProjectVersion;
+                        offset = offset + limit;
+                        additionalSearchParams = $"?offset={offset}&limit={limit}";
+                        codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
 
-                        }
 
-                        var logString = $"{codelocation.name} | {mappedVersion} | {codelocation.scanSize}";
-                        if (filePath != "")
-                        {
-                            Logger.Log(filePath, logString);
-                        }
-                        else
-                        {
-                            Console.WriteLine(logString);
-                        }
                     }
 
                     Console.WriteLine();
-                    Console.WriteLine($"There are {unmappedScansCounter} unmapped scans");
+                    Console.WriteLine($"There are {mappedScansCounter} mapped scans");
+                    Console.WriteLine($"There are {unmappedScansCounter} UNMAPPED scans");
                     Console.WriteLine();
                 }
 
@@ -170,9 +187,10 @@ namespace GetAllProjectsWithVersionCount
                 {
                     Console.WriteLine($"\nFinished logging to file {filePath}");
                 }
+
+                var end = DateTime.Now;
+                Console.WriteLine($"Started {start}, finished {end}");
             });
-
-
 
             // Parse the incoming args and invoke the handler
             return rootCommand.InvokeAsync(args).Result;

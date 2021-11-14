@@ -77,6 +77,9 @@ namespace BlackDuckCMDTools
         }
 
 
+
+
+
         public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectNameVersionName(string projectName, string projectVersionName, string additionalSearchParams)
         {
             var projectId = this.GetProjectIdFromName(projectName);
@@ -230,7 +233,7 @@ namespace BlackDuckCMDTools
 
         public string GetProjectIdFromName(string projectName) //helper function for ProjectId
         {
-            var additinalSearchParams = "?q=name:" + projectName;
+            var additinalSearchParams = "?limit=1&q=name:" + projectName;  // We only need one project
             var fullURL = this._baseUrl + "/api/projects" + additinalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-4+json";
             var content = new StringContent("");
@@ -241,20 +244,13 @@ namespace BlackDuckCMDTools
 
             List<BlackDuckProject> projectList = projectJObject["items"].ToObject<List<BlackDuckProject>>();
 
-            if (projectList.Count != 1)  //no projects or more than one projects
-            {               
-                return projectsString; 
-            }
+            // First project in the list, should be the only one 
+            BlackDuckProject project = projectList[0];
 
-            else
-            {
-                // First project in the list, should be the only one
-                BlackDuckProject project = projectList[0];
+            string projectId = project._meta.href.Split('/').Last();
+            return projectId;
 
-                string projectId = project._meta.href.Split('/').Last();
-                return projectId;
 
-            }
         }
 
         public List<BlackDuckProject> GetAllProjects(string additionalSearchParams)
@@ -270,6 +266,46 @@ namespace BlackDuckCMDTools
         }
 
 
+        public List<BlackDuckScanSummary> GetScanSummaries(string codeLocationId, string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/codelocations/" + codeLocationId  + "/scan-summaries" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
+            var content = new StringContent("");
+            string scanSummaryString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject scanSummariesJObject = JObject.Parse(scanSummaryString);
+            List<BlackDuckScanSummary> scanSummaryList = scanSummariesJObject["items"].ToObject<List<BlackDuckScanSummary>>();
+            return scanSummaryList;
+        }
+
+
+
+        public BlackDuckScanSummary GetLatestScanSummary(string codeLocationId)
+        {
+            var fullURL = this._baseUrl + "/api/codelocations/" + codeLocationId + "/latest-scan-summary";
+            var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
+            var content = new StringContent("");
+            string scanSummaryString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject scanSummaryJObject = JObject.Parse(scanSummaryString);
+            BlackDuckScanSummary scanSummary = scanSummaryJObject.ToObject<BlackDuckScanSummary>();
+            return scanSummary;
+        }
+
+
+
+        public string GetLatestScanSummaryJson(string codeLocationId)
+        {
+            var fullURL = this._baseUrl + "/api/codelocations/" + codeLocationId + "/latest-scan-summary";
+            var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
+            var content = new StringContent("");
+            string scanSummaryString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            return scanSummaryString;
+        }
+
+
+
         public List<BlackDuckCodeLocation> GetAllCodeLocations(string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/codelocations" + additionalSearchParams;
@@ -283,7 +319,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string GeCodeLocationsReturnHTTPResponse(string additionalSearchParams)
+        public string GetCodeLocationsReturnHTTPResponse(string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/codelocations" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
@@ -316,6 +352,21 @@ namespace BlackDuckCMDTools
             string componentString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
             return componentString;
+        }
+
+
+
+
+        public string GetComponentsWithHeadersJson(string projectId, string versionId, string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components/" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
+            var content = new StringContent("");
+
+            string message = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result.ToString();
+            string componentString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            return message + componentString;
         }
 
 
@@ -362,6 +413,22 @@ namespace BlackDuckCMDTools
             List<BlackDuckBOMComponent> componentsList = componentsJObject["items"].ToObject<List<BlackDuckBOMComponent>>();
 
             return componentsList;
+        }
+
+
+        public int CountBomComponents(string projectId, string versionId)
+        {
+            var additinalSearchParams = "?offset=0&limit=1"; //Getting only one component because we only want the totalCount property
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components" + additinalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
+            var content = new StringContent("");
+
+            string componentsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject componentsJObject = JObject.Parse(componentsString);
+            string componentsCount = componentsJObject["totalCount"].ToString();
+
+            return int.Parse(componentsCount);
         }
 
 
