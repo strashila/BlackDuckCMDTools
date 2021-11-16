@@ -166,8 +166,6 @@ namespace GetAllProjectsWithVersionCount
                         offset = offset + limit;
                         additionalSearchParams = $"?offset={offset}&limit={limit}";
                         codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
-
-
                     }
 
                     Console.WriteLine();
@@ -189,7 +187,7 @@ namespace GetAllProjectsWithVersionCount
                 }
 
                 var end = DateTime.Now;
-                Console.WriteLine($"Started {start}, finished {end}");
+                //Console.WriteLine($"Started {start}, finished {end}");
             });
 
             // Parse the incoming args and invoke the handler

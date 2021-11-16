@@ -41,8 +41,12 @@ namespace GetAllProjectsWithVersionCount
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
-                var additionalSearchParams = "?offset=0&limit=10000";
+                var offset = 0;
+                var limit = 1000;
 
+                var additionalSearchParams = $"?offset={offset}&limit={limit}";
+
+                
                 if (token == "" || bdUrl == "")
                 {
                     Console.WriteLine("Parameters missing, use --help");
@@ -113,17 +117,27 @@ namespace GetAllProjectsWithVersionCount
                     Console.WriteLine("Deleting codelocations...");
                     var emptyCodelocations = 0;
 
-                    foreach (var codelocation in codeLocations)
+
+                    while (codeLocations.Count > 0)
                     {
-                        if (codelocation.mappedProjectVersion == null)
+
+                        foreach (var codelocation in codeLocations)
                         {
-                            //codelocation.mappedProjectVersion = "UNMAPPED";
-                            var codeLocationId = codelocation._meta.href.Split("/").Last();
-                            
-                            Console.WriteLine($"Deleting codeLocation {codelocation._meta.href} {bdapi.DeleteCodelocation(codeLocationId)}");
-                            emptyCodelocations++;
-                        }                        
+                            if (codelocation.mappedProjectVersion == null)
+                            {
+                                //codelocation.mappedProjectVersion = "UNMAPPED";
+                                var codeLocationId = codelocation._meta.href.Split("/").Last();
+
+                                Console.WriteLine($"Deleting codeLocation {codelocation._meta.href} {bdapi.DeleteCodelocation(codeLocationId)}");
+                                emptyCodelocations++;
+                            }
+                        }
+
+                        offset = offset + limit;
+                        additionalSearchParams = $"?offset={offset}&limit={limit}";
+                        codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
                     }
+
                     Console.WriteLine($"{emptyCodelocations} unmapped codelocations deleted");
                 }
 

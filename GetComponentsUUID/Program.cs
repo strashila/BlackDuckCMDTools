@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
@@ -60,7 +61,10 @@ namespace GetComponentsUUID
                 List<BlackDuckBOMComponent> components;
 
 
-                var additionalSearchParams = "?offset=0&limit=500";
+                var offset = 0;
+                var limit = 1000;
+
+                var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
                 if (token == "" || bdUrl == "" || projectName == "")
                 {
@@ -121,8 +125,41 @@ namespace GetComponentsUUID
 
                 try
                 {
-                    // Getting the components
-                    components = bdapi.GetBOMComponentsFromProjectNameVersionName(projectName, versionName, additionalSearchParams);
+                    // Getting projectID
+
+
+                    var projectId = bdapi.GetProjectIdFromName(projectName);
+                    var versionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectName, versionName);
+
+                    components = bdapi.GetComponents(projectId, versionId, additionalSearchParams);
+
+
+                    while (components.Count > 0)
+                    {
+                        foreach (BlackDuckBOMComponent BomComponent in components)
+                        {
+                            string uuid = BomComponent.component.Split('/').Last();
+
+                            string logString = BomComponent.componentName + ";" + uuid;
+
+                            if (filePath != "")
+                            {
+                                Logger.Log(filePath, logString);
+
+                            }
+                            else
+                            {
+                                Console.WriteLine(logString);
+                            }
+                        }
+
+
+                        offset = offset + limit;
+                        additionalSearchParams = $"?offset={offset}&limit={limit}";
+                        components = bdapi.GetComponents(projectId, versionId, additionalSearchParams);
+                    }
+
+
                 }
                 catch (Newtonsoft.Json.JsonReaderException ex)
                 {
@@ -155,22 +192,6 @@ namespace GetComponentsUUID
                 }
 
 
-                foreach (BlackDuckBOMComponent component in components)
-                {
-                    string uuid = bdapi.ParseComponentId(component.component);
-
-                    string logString = component.componentName + ";" + uuid;
-
-                    if (filePath != "")
-                    {
-                        Logger.Log(filePath, logString);
-
-                    }
-                    else
-                    {
-                        Console.WriteLine(logString);
-                    }
-                }
                 Console.WriteLine($"\nFinished logging to file {filePath}");
             });
 
