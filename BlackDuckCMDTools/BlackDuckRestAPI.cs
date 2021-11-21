@@ -266,6 +266,9 @@ namespace BlackDuckCMDTools
         }
 
 
+
+
+
         public List<BlackDuckScanSummary> GetScanSummaries(string codeLocationId, string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/codelocations/" + codeLocationId  + "/scan-summaries" + additionalSearchParams;
@@ -316,6 +319,18 @@ namespace BlackDuckCMDTools
             JObject codeLocationsJObject = JObject.Parse(codeLocationsString);
             List<BlackDuckCodeLocation> codeLocationsList = codeLocationsJObject["items"].ToObject<List<BlackDuckCodeLocation>>();
             return codeLocationsList;
+        }
+
+
+
+        public string GetAllCodeLocationsJson(string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/codelocations" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
+            var content = new StringContent("");
+            string codeLocationsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            return codeLocationsString;
         }
 
 
@@ -481,13 +496,9 @@ namespace BlackDuckCMDTools
         }
 
 
-
-
-
-
-        public List<BlackDuckRole> GetRoles()
+        public List<BlackDuckRole> GetRoles(string additionalSearchParams)
         {
-            var fullURL = this._baseUrl + "/api/roles";
+            var fullURL = this._baseUrl + "/api/roles" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
             var content = new StringContent("");
 
@@ -537,6 +548,40 @@ namespace BlackDuckCMDTools
 
             return sourceTrees;
         }
+
+
+        public string GetCurrentUserJson()
+        {
+            var fullURL = this._baseUrl + "/api/current-user";
+            var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
+            var content = new StringContent("");
+            string currentUserJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+            return currentUserJson;
+        }
+
+
+        public List<BlackDuckRole> GetUserRoles(string userId, string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/users/" + userId + "/roles" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
+            var content = new StringContent("");
+            string userRolesJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject rolesListObject = JObject.Parse(userRolesJson);
+            List<BlackDuckRole> rolesList = rolesListObject["items"].ToObject<List<BlackDuckRole>>();
+            return rolesList;
+        }
+
+        public string GetUserRolesJson(string userId, string additinalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/users/" + userId+ "/roles" + additinalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
+            var content = new StringContent("");
+            string userRolesJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+            return userRolesJson;
+        }
+
+
 
         public string ParseComponentId (string component)
 

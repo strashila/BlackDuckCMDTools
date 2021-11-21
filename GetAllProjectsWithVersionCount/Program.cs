@@ -46,7 +46,7 @@ namespace GetAllProjectsWithVersionCount
                 List<BlackDuckProject> projects;
 
 
-                var additionalSearchParams = "?offset=0&limit=500";
+                var additionalSearchParams = "?offset=0&limit=1000";
 
                 if (token == "" || bdUrl == "")
                 {

@@ -41,7 +41,7 @@ namespace GetAllProjectsWithVersionCount
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
-                var additionalSearchParams = "?offset=0&limit=5000";
+                var additionalSearchParams = "?offset=0&limit=1000";
 
                 if (token == "" || bdUrl == "")
                 {

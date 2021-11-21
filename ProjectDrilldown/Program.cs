@@ -25,33 +25,43 @@ namespace GetAllProjectsWithVersionCount
             var token = new Option<string>("--token");
             token.Description = "REQUIRED: BD Token";
 
+
+            var projectName = new Option<string>("--projectname");
+            //secureConnection.SetDefaultValue(false);
+            projectName.Description = "Project Name";
+
+
             var notSecure = new Option<bool>("--not-secure");
             //secureConnection.SetDefaultValue(false);
             notSecure.Description = "Disable secure connection to BlackDuck server";
 
+
             var filePath = new Option<string>("--filepath");
             filePath.AddAlias("-f");
-            filePath.Description = "Output filepath. If not present in options, the tool will print the output to console";
+            filePath.Description = "Output filepath. If not present in options, the tool will print the output to a default file";
 
             var rootCommand = new RootCommand
             {
                 bdUrl,
                 token,
+                projectName,
                 notSecure,
                 filePath,
             };
 
-            rootCommand.Handler = CommandHandler.Create<string, string, bool, string>((bdUrl, token, notSecure, filePath) =>
+            rootCommand.Handler = CommandHandler.Create<string, string, string, bool, string>((bdUrl, token, projectName, notSecure, filePath) =>
             {
-                var start = DateTime.Now;
+                
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
+
+                var defaultFileName = projectName + "_drilldown.csv";
 
                 var offset = 0;
                 var limit = 1000;
 
                 var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
-                if (token == "" || bdUrl == "")
+                if (token == "" || bdUrl == "" || projectName == "")
                 {
                     Console.WriteLine("Parameters missing, use --help");
                     return;
@@ -65,9 +75,9 @@ namespace GetAllProjectsWithVersionCount
                     }
                 }
 
-
+               
                 //Checking valid FilePath input
-                var columnString = "CodeLocation_name|Mapped_project_version|Scan_size";
+                var columnString = "VersionNum;VersionName;VersionURL;CodelocationName;CodelocationID;ScanSize;MatchCount";
                 if (filePath != "")
                 {
                     try
@@ -76,7 +86,7 @@ namespace GetAllProjectsWithVersionCount
                     }
 
                     catch (Exception ex)
-                    
+
                     {
                         if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
                         {
@@ -85,6 +95,7 @@ namespace GetAllProjectsWithVersionCount
                         }
                     }
                 }
+                else filePath = defaultFileName;
 
 
                 /// Trying to create connection to the API both secure and not-secure methods (trusting all SSL certificates or not).
@@ -128,70 +139,57 @@ namespace GetAllProjectsWithVersionCount
                 }
 
 
-
-
                 try
                 {
-                    var codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
-                    var mappedScansCounter = 0;
-                    var unmappedScansCounter = 0;
+                    Console.WriteLine($"Drilldown of project {projectName}");
+                    string projectId = bdapi.GetProjectIdFromName(projectName);
 
 
-                    while (codeLocations.Count > 0)
+
+                    List<BlackDuckProjectVersion> versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
+
+                    Console.WriteLine("Getting versions...");
+                    var versionUrls = new List<string>();
+
+                    foreach (var version in versions)
                     {
-                        
-                        foreach (var codelocation in codeLocations)
+                        versionUrls.Add(version._meta.href);
+                    }
+
+                    Console.WriteLine("Getting Codelocations...");
+                    var codelocations = bdapi.GetAllCodeLocations(additionalSearchParams);
+
+                    Console.WriteLine("Building project file...");
+
+                    while (codelocations.Count > 0)
+                    {
+                        foreach (BlackDuckCodeLocation codelocation in codelocations)
                         {
-                            var mappedVersion = "";
-                            if (codelocation.mappedProjectVersion == null)
+                            if (versionUrls.Contains(codelocation.mappedProjectVersion))
                             {
-                                mappedVersion = "UNMAPPED";
-                                unmappedScansCounter++;
-                            }
+                                var versionName = bdapi.GetVersionNameByID(projectId, codelocation.mappedProjectVersion.Split('/').Last());
+                                var codeLocationId = codelocation._meta.href.Split('/').Last();
+                                var latestScanSummary = bdapi.GetLatestScanSummary(codeLocationId);
 
-                            else
-                            {
-                                mappedVersion = codelocation.mappedProjectVersion;
-                                mappedScansCounter++;
-
-                            }
-
-                            var logString = $"{codelocation.name} | {mappedVersion} | {codelocation.scanSize}";
-                            if (filePath != "")
-                            {
-                                Logger.Log(filePath, logString);
-                            }
-                            else
-                            {
-                                Console.WriteLine(logString);
+                                Logger.Log(filePath, $"{versionUrls.IndexOf(codelocation.mappedProjectVersion)};{versionName};{codelocation.mappedProjectVersion};{codelocation.name};{codeLocationId};{codelocation.scanSize};{latestScanSummary.matchCount}");
                             }
                         }
-
-                        offset = offset + limit;
-                        additionalSearchParams = $"?offset={offset}&limit={limit}";
-                        codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
+                        offset += limit;
+                        codelocations = bdapi.GetAllCodeLocations(additionalSearchParams);
                     }
 
                     Console.WriteLine();
-                    Console.WriteLine($"There are {mappedScansCounter} mapped scans");
-                    Console.WriteLine($"There are {unmappedScansCounter} UNMAPPED scans");
                     Console.WriteLine();
                 }
 
+                // Catching Serialization errors
                 catch (Exception ex)
-                {
-                    // Catching Serialization errors
+                {                    
                     Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl and token ");
                     return;
                 }
 
-                if (filePath != "")
-                {
-                    Console.WriteLine($"\nFinished logging to file {filePath}");
-                }
-
-                var end = DateTime.Now;
-                //Console.WriteLine($"Started {start}, finished {end}");
+                Console.WriteLine($"\nFinished logging to file {filePath}");
             });
 
             // Parse the incoming args and invoke the handler
