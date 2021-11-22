@@ -43,6 +43,7 @@ namespace GetAllProjectsWithVersionCount
 
                 var offset = 0;
                 var limit = 1000;
+                long totalSize = 0;
 
                 var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
@@ -106,6 +107,7 @@ namespace GetAllProjectsWithVersionCount
 
                 try
                 {
+                    Console.WriteLine("Getting codelocations...");
                     var codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
 
                     Console.WriteLine("Warning - you are about to delete all the unmapped codelocations (scans) for your instance. To proceed type Yes");
@@ -117,17 +119,15 @@ namespace GetAllProjectsWithVersionCount
                     Console.WriteLine("Deleting codelocations...");
                     var emptyCodelocations = 0;
 
-
                     while (codeLocations.Count > 0)
                     {
-
                         foreach (var codelocation in codeLocations)
                         {
                             if (codelocation.mappedProjectVersion == null)
                             {
                                 //codelocation.mappedProjectVersion = "UNMAPPED";
                                 var codeLocationId = codelocation._meta.href.Split("/").Last();
-
+                                totalSize += codelocation.scanSize;
                                 Console.WriteLine($"Deleting codeLocation {codelocation._meta.href} {bdapi.DeleteCodelocation(codeLocationId)}");
                                 emptyCodelocations++;
                             }
@@ -138,7 +138,7 @@ namespace GetAllProjectsWithVersionCount
                         codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
                     }
 
-                    Console.WriteLine($"{emptyCodelocations} unmapped codelocations deleted");
+                    Console.WriteLine($"{emptyCodelocations} unmapped codelocations deleted. Total scan size:{totalSize}");
                 }
 
                 catch (Exception ex)
@@ -146,10 +146,8 @@ namespace GetAllProjectsWithVersionCount
                     // Catching Serialization errors
                     Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl and token ");
                     return;
-                }
-                
+                }                
             });
-
             
 
             // Parse the incoming args and invoke the handler

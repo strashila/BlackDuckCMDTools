@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
@@ -46,7 +47,11 @@ namespace GetAllProjectsWithVersionCount
                 List<BlackDuckProject> projects;
 
 
-                var additionalSearchParams = "?offset=0&limit=1000";
+                var offset = 0;
+                var limit = 1000;
+
+                var additionalSearchParams = $"?offset={offset}&limit={limit}";
+
 
                 if (token == "" || bdUrl == "")
                 {
@@ -135,11 +140,14 @@ namespace GetAllProjectsWithVersionCount
                     }
                 }
 
+                Console.WriteLine("Getting projects and versions as Projectname;Versionname");
+                Console.WriteLine();
 
                 foreach (BlackDuckProject proj in projects)
                 {
-                    string projId = bdapi.GetProjectIdFromProjectObject(proj);
-                    int versionCount = bdapi.GetProjectVersionsFromProjectId(projId,additionalSearchParams).Count;
+                    string projId = proj._meta.href.Split('/').Last();
+                    var versionCount = bdapi.CountVersions(projId);
+                    
                     string logString = proj.name + ";" + versionCount;
                     if (filePath != "")
                     {
@@ -150,8 +158,8 @@ namespace GetAllProjectsWithVersionCount
                     {
                         Console.WriteLine(logString);
                     }
-
                 }
+
                 Console.WriteLine($"\nFinished logging to file {filePath}");
             });
 

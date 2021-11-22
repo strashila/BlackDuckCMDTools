@@ -52,12 +52,16 @@ namespace GetComponentsUUID
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
-
-
+                var additionalSearchParamsProject = "?offset=0&limit=1000";
 
                 var additionalSearchParams = "?offset=0&limit=1000";
 
-                if (token == "" || bdUrl == "")
+                //var offset = 0;
+                //var limit = 1000;
+
+
+
+                if (token == "" || bdUrl == "" || component == "")
                 {
                     Console.WriteLine("Parameters missing, use --help");
                     return;
@@ -109,9 +113,7 @@ namespace GetComponentsUUID
                 }
 
 
-
-
-                var columnString = "ComponentName|ProjectName|Version";
+                var columnString = "ComponentName;ProjectName;Version";
 
                 if (filePath != "")
                 {
@@ -130,59 +132,41 @@ namespace GetComponentsUUID
                         }
                     }
                 }
+                else Console.WriteLine(columnString);
 
                 try
                 {
-                    List<BlackDuckProject> allProjects = bdapi.GetAllProjects(additionalSearchParams);
+                    List<BlackDuckProject> allProjects = bdapi.GetAllProjects(additionalSearchParamsProject);
 
                     foreach (BlackDuckProject project in allProjects)
                     {
                         string projectId = project._meta.href.Split('/').Last();
-                        List<BlackDuckProjectVersion> versions;
-                        try
-                        {
-                            versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
-                        }
-                        catch (Exception ex)
-                        {
-                            versions = null;
-                        }
+                        string projectName = project.name;
+                        List<BlackDuckProjectVersion> versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParamsProject);
+                      
+                        foreach (var version in versions)
+                        {                            
+                            var versionId = version._meta.href.Split('/').Last();
+                            var versionName = version.versionName;
 
-                        if (versions != null)
-                        {
-                            foreach (var version in versions)
+                            var additionalSearchParamsComponent = additionalSearchParams + "&q=componentOrVersionName:" + component.ToLower();
+                            var allComponents = bdapi.ListingBomComponents(projectId, versionId, additionalSearchParamsComponent);
+
+
+                            foreach (var singleComponent in allComponents)
                             {
-                                List<BlackDuckBOMComponent> components;
-                                var versionId = version._meta.href.Split('/').Last();
-                                try
+                                var name = singleComponent.componentName.ToLower();
+                                if (name.Contains(component.ToLower()))
                                 {
-                                    components = bdapi.ListingBomComponents(projectId, versionId, additionalSearchParams);
+                                    string logString = singleComponent.componentName + ";" + projectName + ";" + versionName;
 
-                                }
-                                catch (Exception ex)
-                                {
-                                    components = null;
-                                }
-
-                                if (components != null)
-                                {
-                                    foreach (var singleComponent in components)
+                                    if (filePath != "")
                                     {
-                                        var name = singleComponent.componentName.ToLower();
-                                        if (name.Contains(component.ToLower()))
-                                        {
-                                            string logString = singleComponent.componentName + "|" + project.name + "|" + version.versionName;
-
-                                            if (filePath != "")
-                                            {
-                                                Logger.Log(filePath, logString);
-
-                                            }
-                                            else
-                                            {
-                                                Console.WriteLine(logString);
-                                            }
-                                        }
+                                        Logger.Log(filePath, logString);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine(logString);
                                     }
                                 }
                             }

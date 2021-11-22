@@ -27,8 +27,8 @@ namespace GetAllProjectsWithVersionCount
 
 
             var projectName = new Option<string>("--projectname");
-            //secureConnection.SetDefaultValue(false);
-            projectName.Description = "Project Name";
+            
+            projectName.Description = "REQUIRED: Project Name";
 
 
             var notSecure = new Option<bool>("--not-secure");
@@ -38,7 +38,7 @@ namespace GetAllProjectsWithVersionCount
 
             var filePath = new Option<string>("--filepath");
             filePath.AddAlias("-f");
-            filePath.Description = "Output filepath. If not present in options, the tool will print the output to a default file";
+            filePath.Description = "Output filepath. If not present in options, the tool will print the output to a default file: projectName + _drilldown.csv";
 
             var rootCommand = new RootCommand
             {
@@ -50,8 +50,7 @@ namespace GetAllProjectsWithVersionCount
             };
 
             rootCommand.Handler = CommandHandler.Create<string, string, string, bool, string>((bdUrl, token, projectName, notSecure, filePath) =>
-            {
-                
+            {                
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
                 var defaultFileName = projectName + "_drilldown.csv";
@@ -77,7 +76,7 @@ namespace GetAllProjectsWithVersionCount
 
                
                 //Checking valid FilePath input
-                var columnString = "VersionNum;VersionName;VersionURL;CodelocationName;CodelocationID;ScanSize;MatchCount";
+                var columnString = "VersionName;VersionURL;CodelocationName;CodelocationID;ScanSize;MatchCount";
                 if (filePath != "")
                 {
                     try
@@ -95,7 +94,12 @@ namespace GetAllProjectsWithVersionCount
                         }
                     }
                 }
-                else filePath = defaultFileName;
+                else
+                {
+                    filePath = defaultFileName;
+                    Logger.Log(filePath, columnString);
+                } 
+                
 
 
                 /// Trying to create connection to the API both secure and not-secure methods (trusting all SSL certificates or not).
@@ -144,8 +148,6 @@ namespace GetAllProjectsWithVersionCount
                     Console.WriteLine($"Drilldown of project {projectName}");
                     string projectId = bdapi.GetProjectIdFromName(projectName);
 
-
-
                     List<BlackDuckProjectVersion> versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
 
                     Console.WriteLine("Getting versions...");
@@ -171,24 +173,24 @@ namespace GetAllProjectsWithVersionCount
                                 var codeLocationId = codelocation._meta.href.Split('/').Last();
                                 var latestScanSummary = bdapi.GetLatestScanSummary(codeLocationId);
 
-                                Logger.Log(filePath, $"{versionUrls.IndexOf(codelocation.mappedProjectVersion)};{versionName};{codelocation.mappedProjectVersion};{codelocation.name};{codeLocationId};{codelocation.scanSize};{latestScanSummary.matchCount}");
+                                Logger.Log(filePath, $"{versionName};{codelocation.mappedProjectVersion};{codelocation.name};{codeLocationId};{codelocation.scanSize};{latestScanSummary.matchCount}");
                             }
                         }
                         offset += limit;
+                        additionalSearchParams = $"?offset={offset}&limit={limit}";
                         codelocations = bdapi.GetAllCodeLocations(additionalSearchParams);
                     }
-
-                    Console.WriteLine();
-                    Console.WriteLine();
                 }
 
                 // Catching Serialization errors
                 catch (Exception ex)
                 {                    
-                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl and token ");
+                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl, token and ProjectName ");
                     return;
                 }
 
+                Console.WriteLine();
+                Console.WriteLine();
                 Console.WriteLine($"\nFinished logging to file {filePath}");
             });
 

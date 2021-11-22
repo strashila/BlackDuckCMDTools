@@ -123,51 +123,6 @@ namespace GetComponentsUUID
                 }
 
 
-                try
-                {
-                    // Getting projectID
-
-
-                    var projectId = bdapi.GetProjectIdFromName(projectName);
-                    var versionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectName, versionName);
-
-                    components = bdapi.GetComponents(projectId, versionId, additionalSearchParams);
-
-
-                    while (components.Count > 0)
-                    {
-                        foreach (BlackDuckBOMComponent BomComponent in components)
-                        {
-                            string uuid = BomComponent.component.Split('/').Last();
-
-                            string logString = BomComponent.componentName + ";" + uuid;
-
-                            if (filePath != "")
-                            {
-                                Logger.Log(filePath, logString);
-
-                            }
-                            else
-                            {
-                                Console.WriteLine(logString);
-                            }
-                        }
-
-
-                        offset = offset + limit;
-                        additionalSearchParams = $"?offset={offset}&limit={limit}";
-                        components = bdapi.GetComponents(projectId, versionId, additionalSearchParams);
-                    }
-
-
-                }
-                catch (Newtonsoft.Json.JsonReaderException ex)
-                {
-                    // Catching Serialization errors
-                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Bearer Token with appropriate permissions");
-                    return;
-                }
-
 
                 var columnString = "ComponentName;UUID";
 
@@ -189,6 +144,50 @@ namespace GetComponentsUUID
                     }
                 }
 
+
+                try
+                {
+                    // Getting projectID
+
+                    var projectId = bdapi.GetProjectIdFromName(projectName);
+                    var versionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectName, versionName);
+
+                    Console.WriteLine("Getting components...");
+
+                    components = bdapi.GetComponents(projectId, versionId, additionalSearchParams);
+
+                    while (components.Count > 0)
+                    {
+                        foreach (BlackDuckBOMComponent BomComponent in components)
+                        {
+                            string uuid = BomComponent.component.Split('/').Last();
+
+                            string logString = BomComponent.componentName + ";" + uuid;
+
+                            if (filePath != "")
+                            {
+                                Logger.Log(filePath, logString);
+
+                            }
+                            else
+                            {
+                                Console.WriteLine(logString);
+                            }
+                        }
+
+                        offset = offset + limit;
+                        additionalSearchParams = $"?offset={offset}&limit={limit}";
+                        components = bdapi.GetComponents(projectId, versionId, additionalSearchParams);
+                    }
+
+
+                }
+                catch (Newtonsoft.Json.JsonReaderException ex)
+                {
+                    // Catching Serialization errors
+                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Bearer Token with appropriate permissions");
+                    return;
+                }
 
                 Console.WriteLine($"\nFinished logging to file {filePath}");
             });

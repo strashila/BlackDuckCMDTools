@@ -461,6 +461,26 @@ namespace BlackDuckCMDTools
             return int.Parse(componentsCount);
         }
 
+        public int CountVersions(string projectId)
+        {
+            var additinalSearchParams = "?offset=0&limit=1"; //Getting only one version because we only want the totalCount property
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + additinalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
+            var content = new StringContent("");
+
+            string versionString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject versionsJObject = JObject.Parse(versionString);
+            string componentsCount = versionsJObject["totalCount"].ToString();
+
+            return int.Parse(componentsCount);
+        }
+
+
+
+
+
+
 
         public string GetProjectIdFromProjectObject(BlackDuckProject proj)
         {
