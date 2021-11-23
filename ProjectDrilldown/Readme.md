@@ -16,4 +16,4 @@ Example usage:
 ProjectDrilldown.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `MyProject` -f `c:\temp\myproject.txt` --not-secure
 
 Linux:  
-dotnet GetAllScans.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `MyProject`
+dotnet ProjectDrilldown.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `MyProject`
