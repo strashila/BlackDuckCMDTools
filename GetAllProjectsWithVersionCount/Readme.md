@@ -1,4 +1,4 @@
-**GetAllProjectsWithVersionCount** gets the list of all projects in the server with version count.
+**GetAllProjectsWithVersionCount** gets the list of all projects in the hub with version count.
  
 Usage:
   GetAllProjectsWithVersionCount [options]
