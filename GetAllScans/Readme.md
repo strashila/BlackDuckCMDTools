@@ -1,4 +1,5 @@
-**GetAllScans** is a tool that gets the list of all the scans in the hub, and marks if they are mapped to a project version, or unmapped
+**GetAllScans** is a tool that gets the list of all the scans in the hub, and marks if they are mapped to a project version, or unmapped, adds a Codelocation name, version URL  
+and codelocation scanSize
 
 /api-doc/public.html#codelocation-list  
 
