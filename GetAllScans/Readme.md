@@ -14,5 +14,7 @@ Options:
   -f, --filepath <filepath>    | Output filepath. If not present in options, the tool will print the output to console  
  
 Example usage:  
-GetBomMatchedFiles.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` -f `c:\temp\codelocations.txt` --not-secure
+GetAllScans.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` -f `c:\temp\codelocations.txt` --not-secure
 
+Linux:  
+dotnet GetAllScans.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>`
