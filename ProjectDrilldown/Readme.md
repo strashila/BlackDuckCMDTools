@@ -1,4 +1,4 @@
-**ProjectDrilldown** is a tool that takes a project, and creates a complete drilldown - it gets all versions, all codelocations (scans), the total scan size, anf matches from latest scan summary
+**ProjectDrilldown** is a tool that takes a project, and creates a complete drilldown - it gets all versions, all codelocations (scans), the total scan size, and matches from latest scan summary
 
 The command line options parsing is done with the beta System.CommandLine library  
  
