@@ -13,7 +13,7 @@ Options:
   -f, --filepath <filepath>    | Output filepath. If not present in options, the tool will print the output to a default file: projectName + _drilldown.csv
  
 Example usage:  
-ProjectDrilldown.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` -f `c:\temp\myproject.txt` --not-secure
+ProjectDrilldown.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname MyProject -f `c:\temp\myproject.txt` --not-secure
 
 Linux:  
-dotnet GetAllScans.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>`
+dotnet GetAllScans.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname MyProject
