@@ -5,9 +5,7 @@ Usage: DeleteUnmappedCodelocations [options]
 Options:
 --token | REQUIRED: BD Token  
 --bdurl | REQUIRED: BD URL  
---not-secure | Allways trust server certificate 
---version | Show version information  
--?, -h, --help | Show help and usage information
+--not-secure | Allways trust server certificate  
 
 Example usage:  
 DeleteUnmappedCodelocations.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  
