@@ -11,7 +11,7 @@ Options:
 --version | Show version information  
 -?, -h, --help | Show help and usage information  
 
-Example (Linux with dotnet package)  
+Example looking for any log4j components (Linux with dotnet package)  
 $ dotnet GetComponentUsedProjects.dll --bdurl={url} --token={token} --component=log4j --not-secure
 
 
