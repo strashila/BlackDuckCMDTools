@@ -154,7 +154,7 @@ namespace GetComponentsUUID
 
                     Console.WriteLine("Getting components...");
 
-                    components = bdapi.GetComponents(projectId, versionId, additionalSearchParams);
+                    components = bdapi.GetBOMComponents(projectId, versionId, additionalSearchParams);
 
                     while (components.Count > 0)
                     {
@@ -177,7 +177,7 @@ namespace GetComponentsUUID
 
                         offset = offset + limit;
                         additionalSearchParams = $"?offset={offset}&limit={limit}";
-                        components = bdapi.GetComponents(projectId, versionId, additionalSearchParams);
+                        components = bdapi.GetBOMComponents(projectId, versionId, additionalSearchParams);
                     }
 
 

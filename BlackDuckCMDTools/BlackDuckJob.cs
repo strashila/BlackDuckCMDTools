@@ -6,5 +6,6 @@ namespace BlackDuckCMDTools
 {
     public class BlackDuckJob
     {
+        // TODO - Job class
     }
 }

@@ -361,7 +361,7 @@ namespace BlackDuckCMDTools
 
 
 
-        public List<BlackDuckBOMComponent> GetComponents(string projectId, string versionId, string additionalSearchParams)
+        public List<BlackDuckBOMComponent> GetBOMComponents(string projectId, string versionId, string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components/" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
