@@ -10,3 +10,8 @@ Options:
 -f, --filepath | Output filepath. If not present in options, the tool will print the output to console  
 --version | Show version information  
 -?, -h, --help | Show help and usage information  
+
+Example looking for any log4j components (Linux with dotnet package)  
+$ dotnet GetComponentUsedProjects.dll --bdurl={url} --token={token} --component=log4j --not-secure
+
+
