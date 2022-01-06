@@ -211,6 +211,34 @@ namespace BlackDuckCMDTools
         }
 
 
+        public string DeactivateUser(BlackDuckUser user)
+        {
+            var userId = user._meta.href.Split('/').Last();
+            var fullURL = this._baseUrl + "/api/users/" + userId;
+
+            var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
+            var contentType = "application/vnd.blackducksoftware.user-4+json";
+
+            JObject userUpdateJobject = new JObject(
+                   new JProperty("userName", user.userName),
+                   new JProperty("firstName", user.firstName),
+                   new JProperty("lastName", user.lastName),
+                   new JProperty("type", user.type),
+                   new JProperty("externalUserName", user.externalUserName),
+                   new JProperty("email", user.email),
+                   new JProperty("active", false)
+                   );
+
+            var content = new StringContent(userUpdateJobject.ToString(), Encoding.UTF8, contentType);
+            var response = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Put, acceptHeader, content).Result;
+
+            var updatedUser = JObject.Parse(response).ToObject<BlackDuckUser>();
+
+            return response;
+
+        }
+
+
 
 
 
@@ -590,6 +618,19 @@ namespace BlackDuckCMDTools
             JObject rolesListObject = JObject.Parse(userRolesJson);
             List<BlackDuckRole> rolesList = rolesListObject["items"].ToObject<List<BlackDuckRole>>();
             return rolesList;
+        }
+
+
+        public List<BlackDuckUser> GetUsers(string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/users" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
+            var content = new StringContent("");
+            string usersJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject usersListObject = JObject.Parse(usersJson);
+            List<BlackDuckUser> usersList = usersListObject["items"].ToObject<List<BlackDuckUser>>();
+            return usersList;
         }
 
         public string GetUserRolesJson(string userId, string additinalSearchParams)
