@@ -19,25 +19,38 @@ namespace GetAllProjectsWithVersionCount
             /// https://github.com/dotnet/command-line-api/blob/main/docs/Your-first-app-with-System-CommandLine.md
 
 
-            var bdUrl = new Option<string>("--bdurl");
-            bdUrl.Description = "REQUIRED: BlackDuck URL";
+            var _bdurl = new Option<string>(
+                "--bdurl",
+                description: "REQUIRED: BlackDuck URL"
+                );
 
-            var token = new Option<string>("--token");
-            token.Description = "REQUIRED: BD Token";
+            var _token = new Option<string>(
+                "--token",
+                description: "REQUIRED: BD Token"
+                );
+            
 
 
-            var email = new Option<string>("--email");
-            token.Description = "REQUIRED: User Email";
 
-            var notSecure = new Option<bool>("--not-secure");            
-            notSecure.Description = "Disable secure connection to BlackDuck server";
+            var _email = new Option<string>(
+                "--email",
+                description: "REQUIRED: User Email"
+                );
+
+
+            var _trustcert = new Option<bool>(
+                "--trust-cert",
+                description: "Trust the certificate of the BD server",
+                getDefaultValue: () => false
+                );
+
 
             var rootCommand = new RootCommand
             {
-                bdUrl,
-                token,
-                email,
-                notSecure
+                _bdurl,
+                _token,
+                _email,
+                _trustcert
             };
 
 
@@ -46,7 +59,7 @@ namespace GetAllProjectsWithVersionCount
 
 
             rootCommand.SetHandler(
-            (string bdUrl, string token, string email, bool notSecure) => 
+            (string bdUrl, string token, string email, bool trustCert) => 
                 {
                     BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
@@ -55,7 +68,7 @@ namespace GetAllProjectsWithVersionCount
                     var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
 
-                    if (token == "" || bdUrl == "" || email == "")
+                    if (token == null || bdUrl == null || email == null)
                     {
                         Console.WriteLine("Parameters missing, use --help");
                         return;
@@ -73,7 +86,7 @@ namespace GetAllProjectsWithVersionCount
                     /// Trying to create connection to the API both secure and not-secure methods (trusting all SSL certificates or not).
                     /// Catching errors both times
 
-                    if (notSecure)
+                    if (trustCert)
                     {
                         try
                         {
@@ -114,15 +127,19 @@ namespace GetAllProjectsWithVersionCount
                     try
                     {
                         Console.WriteLine("Getting users...");
+                        Console.WriteLine();
                         var users = bdapi.GetUsers(additionalSearchParams);
 
                         while (users.Count > 0)
                         {
                             foreach (var user in users)
                             {
-                                if (user.email != null && user.email == email && user.type == "EXTERNAL")
+                                if (user.email != null && user.email == email && user.active == true && user.type == "EXTERNAL")
                                 {
-                                    Console.WriteLine(bdapi.DeactivateUser(user));
+                                    var deactivatedUser = (bdapi.DeactivateUser(user));
+                                    Console.WriteLine("User Deactivated");
+                                    Console.WriteLine(deactivatedUser);
+                                    Console.WriteLine();
                                 }
                             }
 
@@ -138,9 +155,10 @@ namespace GetAllProjectsWithVersionCount
                         Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl and token ");
                         return;
                     }
+
                 },
 
-            bdUrl, token, email, notSecure);
+            _bdurl, _token, _email, _trustcert);
 
             return rootCommand.InvokeAsync(args).Result;
         }

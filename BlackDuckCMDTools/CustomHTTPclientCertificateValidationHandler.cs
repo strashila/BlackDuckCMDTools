@@ -6,14 +6,20 @@ using System.Text;
 
 namespace BlackDuckCMDTools
 {
-    public class CustomHTTPclientCertificateValidationHandler
+    public static class CustomHTTPclientCertificateValidationHandler
     {
-        public CustomHTTPclientCertificateValidationHandler()
-        {
+        /// <summary>
+        /// This is a class that handles custom SSL certificate validation
+        /// It returns HTTPhandlers set either to trust all certs or to check server hash
+        /// </summary>
+        /// <returns></returns>
 
-        }
+        //public CustomHTTPclientCertificateValidationHandler()
+        //{
 
-        public HttpClient CreateHTTPClientNoCertificateValidation()
+        //}
+
+        public static HttpClient CreateHTTPClientNoCertificateValidation()
         {
             // This HTTPhandler is set to make .NET to ignore all Certificate Validation errors https://stackoverflow.com/questions/2675133/c-sharp-ignore-certificate-errors
             // We need that since all of our internal support BD hubs don't have proper SSL certificate installed
@@ -29,7 +35,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public HttpClient CreateHTTPClientCertificateValidationWithServerHash(string hash)
+        public static HttpClient CreateHTTPClientCertificateValidationWithServerHash(string hash)
         {
             // This HTTPhandler is set to check specific server hash and validate by that hash
             // In Chrome click on Secure or Not Secure in the address bar. Then click on Certificate -> Details -> Thumbprint and copy the value.

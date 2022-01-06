@@ -26,15 +26,14 @@ namespace BlackDuckCMDTools
             this._apiToken = token;
             if (certValidation)
             {
-                // regular HttpClient with cert validation
+                // This creates a regular HttpClient which does cert validation
                 this._httpClient = new HttpClient(); 
             }
 
             else
-
             {
                 // HttpClient without cert validation. For regular httpclient use this.httpClient = new HttpClient();
-                this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientNoCertificateValidation();  
+                this._httpClient = CustomHTTPclientCertificateValidationHandler.CreateHTTPClientNoCertificateValidation();  
             }
            
             this._bearerToken = this.CreateBearerToken();
@@ -44,12 +43,11 @@ namespace BlackDuckCMDTools
         public BlackDuckRestAPI(string url, string token, string bdServerHash) //
         {
             /// This is an overload constructor with server hash verification
-            /// HTTPhandler is set to check specific server hash and validate by that hash
-            
+            /// HTTPhandler is set to check specific server hash and validate by that hash            
 
             this._baseUrl = url;
             this._apiToken = token;
-            this._httpClient = new CustomHTTPclientCertificateValidationHandler().CreateHTTPClientCertificateValidationWithServerHash(bdServerHash);
+            this._httpClient = CustomHTTPclientCertificateValidationHandler.CreateHTTPClientCertificateValidationWithServerHash(bdServerHash);
             this._bearerToken = this.CreateBearerToken();
             this._authorizationBearerString = "Bearer " + _bearerToken;
         }
@@ -75,9 +73,6 @@ namespace BlackDuckCMDTools
         {
             this._bearerToken = this.CreateBearerToken();
         }
-
-
-
 
 
         public List<BlackDuckBOMComponent> GetBOMComponentsFromProjectNameVersionName(string projectName, string projectVersionName, string additionalSearchParams)
@@ -112,13 +107,10 @@ namespace BlackDuckCMDTools
             string versionId = this.GetVersionIdFromProjectNameAndVersionName(projectName, projectVersionName);
 
             return this.DeleteProjectVersionByProjectIdVersionId(projectId, versionId);
-
-
         }
 
         public string DeleteProjectVersionByProjectIdVersionId(string projectId, string versionId)
         {
-
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId;
             var acceptHeader = "";
             var content = new StringContent("");
@@ -132,7 +124,6 @@ namespace BlackDuckCMDTools
 
         public string DeleteProjectByProjectId(string projectId)
         {
-
             var fullURL = this._baseUrl + "/api/projects/" + projectId;
             var acceptHeader = "";
             var content = new StringContent("");
@@ -145,7 +136,6 @@ namespace BlackDuckCMDTools
 
         public string DeleteCodelocation(string codelocationId)
         {
-
             var fullURL = this._baseUrl + "/api/codelocations/" + codelocationId;
             var acceptHeader = "";
             var content = new StringContent("");
@@ -160,7 +150,6 @@ namespace BlackDuckCMDTools
 
         public string CreateProjectReturnHttpMessage(string projectJson)
         {
-
             var fullURL = this._baseUrl + "/api/projects";
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-4+json";
             var content = new StringContent(projectJson, Encoding.UTF8, "application/vnd.blackducksoftware.project-detail-4+json");
@@ -169,7 +158,6 @@ namespace BlackDuckCMDTools
             // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
             // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created project ID /projects/7cb65d55-1194-48e4-a3b0-a831d97253ee
 
-
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
             return responseMessage.ToString();
         }
@@ -177,7 +165,6 @@ namespace BlackDuckCMDTools
 
         public string CreateProjectReturnProjectId(string projectJson)
         {
-
             var fullURL = this._baseUrl + "/api/projects";
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-4+json";
             var content = new StringContent(projectJson, Encoding.UTF8, "application/vnd.blackducksoftware.project-detail-4+json");
@@ -196,7 +183,6 @@ namespace BlackDuckCMDTools
 
         public string CreateVersionLicenseReport(string versionId, string reportJson)
         {
-
             var fullURL = this._baseUrl + "/api/versions/" + versionId + "/license-reports";
             var acceptHeader = "application/vnd.blackducksoftware.report-4+json";
             var content = new StringContent(reportJson, Encoding.UTF8, "application/vnd.blackducksoftware.report-4+json");
@@ -205,17 +191,14 @@ namespace BlackDuckCMDTools
             // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
             // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created report ID: Location: /vulnerability-reports/{reportId}
 
-
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
             return responseMessage.ToString();
         }
 
 
         public string DeactivateUser(BlackDuckUser user)
-        {
-            var userId = user._meta.href.Split('/').Last();
-            var fullURL = this._baseUrl + "/api/users/" + userId;
-
+        {           
+            var fullURL = user._meta.href;
             var acceptHeader = "application/vnd.blackducksoftware.user-4+json";
             var contentType = "application/vnd.blackducksoftware.user-4+json";
 
@@ -230,21 +213,18 @@ namespace BlackDuckCMDTools
                    );
 
             var content = new StringContent(userUpdateJobject.ToString(), Encoding.UTF8, contentType);
+
             var response = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Put, acceptHeader, content).Result;
 
-            var updatedUser = JObject.Parse(response).ToObject<BlackDuckUser>();
+            //var updatedUser = JObject.Parse(response).ToObject<BlackDuckUser>();
 
             return response;
-
         }
-
-
 
 
 
         public string ReturnPolicyRules()
         {
-
             var fullURL = this._baseUrl + "/api/policy-rules";
             var acceptHeader = "application/vnd.blackducksoftware.policy-5+json";
             var content = new StringContent("");
@@ -277,8 +257,6 @@ namespace BlackDuckCMDTools
 
             string projectId = project._meta.href.Split('/').Last();
             return projectId;
-
-
         }
 
         public List<BlackDuckProject> GetAllProjects(string additionalSearchParams)
@@ -396,7 +374,6 @@ namespace BlackDuckCMDTools
             var content = new StringContent("");
             string componentString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
-
             JObject componentObj = JObject.Parse(componentString);
             List<BlackDuckBOMComponent> componentList = componentObj["items"].ToObject<List<BlackDuckBOMComponent>>();
             return componentList;
@@ -444,7 +421,6 @@ namespace BlackDuckCMDTools
 
         public List<BlackDuckProjectVersion> GetProjectVersionsFromProjectId(string projectId, string additinalSearchParams)
         {
-
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions" + additinalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
             var content = new StringContent("");
@@ -460,7 +436,6 @@ namespace BlackDuckCMDTools
 
         public List<BlackDuckBOMComponent> ListingBomComponents(string projectId, string versionId, string additinalSearchParams)
         {
-
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components" + additinalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
             var content = new StringContent("");
@@ -561,7 +536,6 @@ namespace BlackDuckCMDTools
 
         public List<BlackDuckMatchedFileWithComponent> GetBOMMatchedFilesWithComponent(string projectName, string projectVersionName, string additionalSearchParams) 
         {
-
             /// api-doc/public.html#matched-file-with-component-representation
             /// 
 
