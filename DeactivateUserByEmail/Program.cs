@@ -27,9 +27,7 @@ namespace GetAllProjectsWithVersionCount
             var _token = new Option<string>(
                 "--token",
                 description: "REQUIRED: BD Token"
-                );
-            
-
+                );        
 
 
             var _email = new Option<string>(
