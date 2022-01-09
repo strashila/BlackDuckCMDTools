@@ -8,7 +8,7 @@ Usage: DeactivateUsersByEmail [options]
 
  
 Example usage:  
-DeactivateUsersByEmail.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --email `user@email.com` `--trust-cert`
+DeactivateUsersByEmail.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --email `user@email.com` --trust-cert
 
 Linux:  
-dotnet DeactivateUsersByEmail.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --email `user@email.com` `--trust-cert`
+dotnet DeactivateUsersByEmail.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --email `user@email.com` --trust-cert
