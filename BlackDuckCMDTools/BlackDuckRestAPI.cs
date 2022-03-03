@@ -340,6 +340,34 @@ namespace BlackDuckCMDTools
         }
 
 
+
+
+        public string GetSingleCodeLocationJson(string codeLocationId)
+        {
+            var fullURL = this._baseUrl + "/api/codelocations/" + codeLocationId;
+            var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
+            var content = new StringContent("");
+            string codeLocationsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            return codeLocationsString;
+        }
+
+
+
+
+        public string DeleteCodeLocation(string codeLocationId)
+        {
+            var fullURL = this._baseUrl + "/api/codelocations/" + codeLocationId;
+            var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
+            var content = new StringContent("");
+            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Delete, acceptHeader, content).Result;
+
+            // Creating a readable status code response ourselves from HttpResponseMessage. Casting int to get status code number, like "204", and the StatusCode like "No Content"
+            return ((int)responseMessage.StatusCode).ToString() + " " + responseMessage.StatusCode.ToString();
+        }
+
+
+
         public string GetCodeLocationsReturnHTTPResponse(string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/codelocations" + additionalSearchParams;
@@ -347,9 +375,7 @@ namespace BlackDuckCMDTools
             var content = new StringContent("");
             HttpResponseMessage codeLocationsMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
-            return codeLocationsMessage.ToString();
-
-    
+            return codeLocationsMessage.ToString();    
         }
 
         public string GetProjectNameByID(string projectId)
