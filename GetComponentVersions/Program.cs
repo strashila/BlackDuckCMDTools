@@ -8,7 +8,7 @@ using System.Net.Http;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
 
-namespace GetComponentsUUID
+namespace GetAllProjectsWithVersionCount
 {
     class Program
     {
@@ -18,55 +18,65 @@ namespace GetComponentsUUID
             /// Uses the beta System.CommandLine library to parse command line arguments 
             /// https://github.com/dotnet/command-line-api/blob/main/docs/Your-first-app-with-System-CommandLine.md
 
-            var bdUrl = new Option<string>("--bdurl");
-            bdUrl.Description = "REQUIRED: BlackDuck URL";
 
-            var token = new Option<string>("--token");
-            token.Description = "REQUIRED: BD Token";
+            var _bdurl = new Option<string>(
+                "--bdurl",
+                description: "REQUIRED: BlackDuck URL"
+                );
 
-
-            var projectName = new Option<string>("--projectname");
-            projectName.Description = "REQUIRED: Project name";
-
-            var versioNname = new Option<string>("--versionname");
-            versioNname.Description = "REQUIRED: Version name";
-
-            var notSecure = new Option<bool>("--not-secure");
-            //secureConnection.SetDefaultValue(false);
-            notSecure.Description = "Disable secure connection to BlackDuck server";
+            var _token = new Option<string>(
+                "--token",
+                description: "REQUIRED: BD Token"
+                );
 
 
-            var filePath = new Option<string>("--filepath");
-            filePath.AddAlias("-f");
-            filePath.Description = "Output filepath. If not present in options, the tool will print the output to console";
+            var _component = new Option<string>(
+                "--component",
+                description: "REQUIRED: Component UUID"
+                );
 
 
-            var filter = new Option<string>("--filter");
-            filter.Description = "Supported Filters: see list here: /api-doc/public.html#_listing_bom_components";
+            var _notsecure = new Option<bool>(
+                "--not-secure",
+                description: "Trust the certificate of the BD server",
+                getDefaultValue: () => false
+                );
+
+
+            var _filename = new Option<string>(
+                "--filename",
+                description: "Write output to file",
+                getDefaultValue: () => ""
+                );
+
+            _filename.AddAlias("-f");
+
 
             var rootCommand = new RootCommand
             {
-                bdUrl,
-                token,                
-                projectName,
-                versioNname,
-                notSecure,
-                filePath,
-                filter
+                _bdurl,
+                _token,
+                _component,
+                _notsecure,
+                _filename
             };
 
-            rootCommand.Handler = CommandHandler.Create<string, string, string, string, bool, string, string>((bdUrl, token, projectName, versionName, notSecure, filePath, filter) =>
+
+            // The new command handler API
+            // https://github.com/dotnet/command-line-api/issues/1537
+
+
+            rootCommand.SetHandler(
+            (string bdUrl, string token, string component, bool notSecure, string filename) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
-                List<BlackDuckBOMComponent> components;
-
 
                 var offset = 0;
-                var limit = 1000;
-
+                var limit = 10;
                 var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
-                if (token == "" || bdUrl == "" || projectName == "")
+
+                if (token == null || bdUrl == null || component == null)
                 {
                     Console.WriteLine("Parameters missing, use --help");
                     return;
@@ -79,6 +89,10 @@ namespace GetComponentsUUID
                         bdUrl = bdUrl.Remove(bdUrl.LastIndexOf("/"));
                     }
                 }
+
+
+                /// Trying to create connection to the API both secure and not-secure methods (trusting all SSL certificates or not).
+                /// Catching errors both times
 
                 if (notSecure)
                 {
@@ -117,20 +131,14 @@ namespace GetComponentsUUID
                     }
                 }
 
-                if (filter != "")
-                {
-                    additionalSearchParams += "&" + filter;
-                }
 
+                var columnString = "ComponenUUID;VesrionsNum;VersionUUID";
 
-
-                var columnString = "ComponentName;UUID";
-
-                if (filePath != "")
+                if (filename != "")
                 {
                     try
                     {
-                        Logger.Log(filePath, columnString);
+                        Logger.Log(filename, columnString);
                     }
 
                     catch (Exception ex)
@@ -144,55 +152,53 @@ namespace GetComponentsUUID
                     }
                 }
 
+                else Console.WriteLine(columnString); 
+
 
                 try
                 {
-                    // Getting projectID
+                    var versions = bdapi.GetComponentVersions(component, additionalSearchParams);
 
-                    var projectId = bdapi.GetProjectIdFromName(projectName);
-                    var versionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectName, versionName);
-
-                    Console.WriteLine("Getting components...");
-
-                    components = bdapi.GetBOMComponents(projectId, versionId, additionalSearchParams);
-
-                    while (components.Count > 0)
+                    while (versions.Count > 0)
                     {
-                        foreach (BlackDuckBOMComponent BomComponent in components)
+                        foreach (var version in versions)
                         {
-                            string uuid = BomComponent.component.Split('/').Last();
-
-                            string logString = BomComponent.componentName + ";" + uuid;
-
-                            if (filePath != "")
+                            if (version._meta.href != null)
                             {
-                                Logger.Log(filePath, logString);
-
-                            }
-                            else
-                            {
-                                Console.WriteLine(logString);
-                            }
+                                string versionUUID = version._meta.href.Split('/').Last();
+                                var logstring = component + ";" + version.versionName + ";" + versionUUID;
+                                if (filename != "")
+                                {
+                                    Logger.Log(filename, logstring);
+                                }
+                                else Console.WriteLine(logstring);
+                            }                            
                         }
 
-                        offset = offset + limit;
-                        additionalSearchParams = $"?offset={offset}&limit={limit}";
-                        components = bdapi.GetBOMComponents(projectId, versionId, additionalSearchParams);
+                        if (versions.Count < limit)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            offset = offset + limit;
+                            additionalSearchParams = $"?offset={offset}&limit={limit}";
+                            versions = bdapi.GetComponentVersions(component, additionalSearchParams);
+                        }
                     }
                 }
-                catch (Newtonsoft.Json.JsonReaderException ex)
+
+                catch (Exception ex)
                 {
                     // Catching Serialization errors
-                    Console.WriteLine("\nError: Please check that you have correct ProjectName, VersionName and Bearer Token with appropriate permissions");
+                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl and token ");
                     return;
                 }
+            },
 
-                Console.WriteLine($"\nFinished logging to file {filePath}");
-            });
+            _bdurl, _token, _component, _notsecure, _filename);
 
-            // Parse the incoming args and invoke the handler
             return rootCommand.InvokeAsync(args).Result;
-
         }
     }
 }

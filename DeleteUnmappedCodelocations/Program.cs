@@ -140,6 +140,7 @@ namespace GetAllProjectsWithVersionCount
                         Console.WriteLine("No Unmapped Codelocations present, nothing to delete");
                         return;
                     }
+
                     Console.WriteLine();
                     Console.WriteLine("Important: You are about to delete all the listed above Unmapped Codelocations (scans) for your instance. To proceed type Yes");
                     string concent = Console.ReadLine();

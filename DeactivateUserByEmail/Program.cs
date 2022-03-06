@@ -36,11 +36,12 @@ namespace GetAllProjectsWithVersionCount
                 );
 
 
-            var _trustcert = new Option<bool>(
-                "--trust-cert",
+            var _notsecure = new Option<bool>(
+                "--not-secure",
                 description: "Trust the certificate of the BD server",
                 getDefaultValue: () => false
                 );
+
 
 
             var rootCommand = new RootCommand
@@ -48,7 +49,7 @@ namespace GetAllProjectsWithVersionCount
                 _bdurl,
                 _token,
                 _email,
-                _trustcert
+                _notsecure
             };
 
 
@@ -57,7 +58,7 @@ namespace GetAllProjectsWithVersionCount
 
 
             rootCommand.SetHandler(
-            (string bdUrl, string token, string email, bool trustCert) => 
+            (string bdUrl, string token, string email, bool notSecure) => 
                 {
                     BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
@@ -84,7 +85,7 @@ namespace GetAllProjectsWithVersionCount
                     /// Trying to create connection to the API both secure and not-secure methods (trusting all SSL certificates or not).
                     /// Catching errors both times
 
-                    if (trustCert)
+                    if (notSecure)
                     {
                         try
                         {
@@ -156,7 +157,7 @@ namespace GetAllProjectsWithVersionCount
 
                 },
 
-            _bdurl, _token, _email, _trustcert);
+            _bdurl, _token, _email, _notsecure);
 
             return rootCommand.InvokeAsync(args).Result;
         }
