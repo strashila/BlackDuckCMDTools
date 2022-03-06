@@ -109,27 +109,23 @@ namespace GetAllProjectsWithVersionCount
                 {
                     Console.WriteLine("Getting codelocations...");
                     var codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
+                    var unmappedCodelocationsCount = 0;
+                    var unmappedCodelocationsList = new List<BlackDuckCodeLocation>();
 
-                    Console.WriteLine("Warning - you are about to delete all the unmapped codelocations (scans) for your instance. To proceed type Yes");
-                    string concent = Console.ReadLine();
-                    if (concent.ToLower() != "yes")
-                    {
-                        return;
-                    }
-                    Console.WriteLine("Deleting codelocations...");
-                    var emptyCodelocations = 0;
-
+                    Console.WriteLine();
+                    Console.WriteLine("Listing Unmapped codelocations...");
+                    
                     while (codeLocations.Count > 0)
                     {
                         foreach (var codelocation in codeLocations)
                         {
                             if (codelocation.mappedProjectVersion == null)
                             {
-                                //codelocation.mappedProjectVersion = "UNMAPPED";
                                 var codeLocationId = codelocation._meta.href.Split("/").Last();
                                 totalSize += codelocation.scanSize;
-                                Console.WriteLine($"Deleting codeLocation {codelocation._meta.href} {bdapi.DeleteCodelocation(codeLocationId)}");
-                                emptyCodelocations++;
+                                unmappedCodelocationsCount++;
+                                Console.WriteLine(codelocation.name);
+                                unmappedCodelocationsList.Add(codelocation);
                             }
                         }
 
@@ -138,7 +134,31 @@ namespace GetAllProjectsWithVersionCount
                         codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
                     }
 
-                    Console.WriteLine($"{emptyCodelocations} unmapped codelocations deleted. Total scan size:{totalSize}");
+                    if (unmappedCodelocationsCount == 0)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("No Unmapped Codelocations present, nothing to delete");
+                        return;
+                    }
+                    Console.WriteLine();
+                    Console.WriteLine("Important: You are about to delete all the listed above Unmapped Codelocations (scans) for your instance. To proceed type Yes");
+                    string concent = Console.ReadLine();
+
+                    if (concent.ToLower() != "yes")
+                    {
+                        return;
+                    }
+
+                    Console.WriteLine("Deleting codelocations...");
+
+                    foreach (BlackDuckCodeLocation scan in unmappedCodelocationsList)
+                    {
+                        var codeLocationId = scan._meta.href.Split("/").Last();
+                        Console.WriteLine($"Deleting codeLocation {scan._meta.href} {bdapi.DeleteCodelocation(codeLocationId)}");
+                    }
+
+                    Console.WriteLine();
+                    Console.WriteLine($"{unmappedCodelocationsCount} unmapped codelocations deleted. Total scan size:{totalSize}");
                 }
 
                 catch (Exception ex)
