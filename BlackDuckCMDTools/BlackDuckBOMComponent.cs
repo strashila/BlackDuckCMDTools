@@ -12,6 +12,6 @@ namespace BlackDuckCMDTools
         public string componentName;
         public string component; //component URL, like "/components/dfb9e6a1-7f47-4b73-a10c-136c7cd89e2e"
         public int totalFileMatchCount;
-
+        public BlackDuckAPI_meta _meta;
     }
 }

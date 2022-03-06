@@ -328,6 +328,21 @@ namespace BlackDuckCMDTools
         }
 
 
+        public List<BlackDuckBOMComponentVersion> GetComponentVersions (string componentId, string additionalSearchParams)
+        {
+            var fullURL = this._baseUrl + "/api/components/" + componentId + "/versions" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.component-detail-5+json";
+            var content = new StringContent("");
+            string componentVersionsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject componentVersionsJObject = JObject.Parse(componentVersionsString);
+            List<BlackDuckBOMComponentVersion> componentVersionsList = componentVersionsJObject["items"].ToObject<List<BlackDuckBOMComponentVersion>>();
+            return componentVersionsList;
+
+
+        }
+
+
 
         public string GetAllCodeLocationsJson(string additionalSearchParams)
         {
@@ -363,6 +378,10 @@ namespace BlackDuckCMDTools
 
             return codeLocationsMessage.ToString();    
         }
+
+
+
+
 
         public string GetProjectNameByID(string projectId)
         {
@@ -490,8 +509,6 @@ namespace BlackDuckCMDTools
 
             return int.Parse(componentsCount);
         }
-
-
 
 
 
