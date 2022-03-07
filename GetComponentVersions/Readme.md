@@ -5,7 +5,7 @@ The tool builds a CSV-like output with component UUID, version name, and version
 
 Usage: GetComponentVersions [options]
 
-Options:
+Options:  
 --token | REQUIRED: BD Token  
 --bdurl | REQUIRED: BD URL  
 --component | REQUIRED: component UUID  
