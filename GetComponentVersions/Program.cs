@@ -193,7 +193,7 @@ namespace GetAllProjectsWithVersionCount
                 catch (Exception ex)
                 {
                     // Catching Serialization errors
-                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl and token ");
+                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl, token and ComponentUUID ");
                     return;
                 }
             },
