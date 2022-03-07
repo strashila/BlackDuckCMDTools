@@ -165,7 +165,7 @@ namespace GetAllProjectsWithVersionCount
                     foreach (BlackDuckCodeLocation scan in unmappedCodelocationsList)
                     {
                         var codeLocationId = scan._meta.href.Split("/").Last();
-                        Console.WriteLine($"Deleting codeLocation {scan._meta.href} {bdapi.DeleteCodelocation(codeLocationId)}");
+                        Console.WriteLine($"Deleting codeLocation {scan.name} {bdapi.DeleteCodelocation(codeLocationId)}");
                     }
 
                     Console.WriteLine();
