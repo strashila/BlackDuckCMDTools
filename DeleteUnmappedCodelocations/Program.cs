@@ -114,6 +114,8 @@ namespace GetAllProjectsWithVersionCount
 
                     Console.WriteLine();
                     Console.WriteLine("Listing Unmapped codelocations...");
+
+
                     
                     while (codeLocations.Count > 0)
                     {
@@ -129,15 +131,23 @@ namespace GetAllProjectsWithVersionCount
                             }
                         }
 
-                        offset = offset + limit;
-                        additionalSearchParams = $"?offset={offset}&limit={limit}";
-                        codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
+
+                        if (codeLocations.Count < limit)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            offset = offset + limit;
+                            additionalSearchParams = $"?offset={offset}&limit={limit}";
+                            codeLocations = bdapi.GetAllCodeLocations(additionalSearchParams);
+                        }
                     }
 
                     if (unmappedCodelocationsCount == 0)
                     {
                         Console.WriteLine();
-                        Console.WriteLine("No Unmapped Codelocations present, nothing to delete");
+                        Console.WriteLine("No Unmapped Codelocations, nothing to delete");
                         return;
                     }
 
@@ -159,7 +169,7 @@ namespace GetAllProjectsWithVersionCount
                     }
 
                     Console.WriteLine();
-                    Console.WriteLine($"{unmappedCodelocationsCount} unmapped codelocations deleted. Total scan size:{totalSize}");
+                    Console.WriteLine($"{unmappedCodelocationsCount} unmapped codelocations deleted. Total scan size: {totalSize}");
                 }
 
                 catch (Exception ex)

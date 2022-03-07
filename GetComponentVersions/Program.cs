@@ -72,7 +72,7 @@ namespace GetAllProjectsWithVersionCount
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
                 var offset = 0;
-                var limit = 10;
+                var limit = 1000;
                 var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
 
@@ -131,8 +131,10 @@ namespace GetAllProjectsWithVersionCount
                     }
                 }
 
+                Console.WriteLine($"Getting versions for component UUID: {component}");
+                Console.WriteLine();
 
-                var columnString = "ComponenUUID;VesrionsNum;VersionUUID";
+                var columnString = "ComponenUUID;VersionName;VersionUUID";
 
                 if (filename != "")
                 {
