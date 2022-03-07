@@ -9,7 +9,7 @@ Options:
 --token | REQUIRED: BD Token  
 --bdurl | REQUIRED: BD URL  
 --component | REQUIRED: component UUID  
---not-secure | Allways trust server certificate 
+--not-secure | Allways trust server certificate  
 -f, --filename | Output filepath. If not present in options, the tool will print the output to console  
 --version | Show version information  
 -?, -h, --help | Show help and usage information
