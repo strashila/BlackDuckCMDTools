@@ -216,8 +216,6 @@ namespace BlackDuckCMDTools
 
             var response = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Put, acceptHeader, content).Result;
 
-            //var updatedUser = JObject.Parse(response).ToObject<BlackDuckUser>();
-
             return response;
         }
 
