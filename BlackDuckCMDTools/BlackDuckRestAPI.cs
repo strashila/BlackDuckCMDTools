@@ -419,6 +419,25 @@ namespace BlackDuckCMDTools
         }
 
 
+        public string GetBOMComponenCopyrightJson(BlackDuckBOMComponent component)
+        {
+            if (component.origins == null || component.origins[0] == null)
+            {
+                return "";
+            }
+
+            else
+            {
+                var componentOriginHref = component.origins[0].origin;
+                var fullCopyrightURL = componentOriginHref + "/copyrights";
+                var acceptHeader = "application/vnd.blackducksoftware.copyright-4+json";
+                var content = new StringContent("");
+                string copyrightsString = this._httpClient.MakeHTTPRequestAsync(fullCopyrightURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+                return copyrightsString;
+            }          
+        }
+
+
 
 
         public string GetComponentsWithHeadersJson(string projectId, string versionId, string additionalSearchParams)
@@ -508,15 +527,6 @@ namespace BlackDuckCMDTools
             return int.Parse(componentsCount);
         }
 
-
-
-
-
-        public string GetProjectIdFromProjectObject(BlackDuckProject proj)
-        {
-            string projectURL = proj._meta.href;
-            return projectURL.Split('/').Last();
-        }
 
 
         public string GetVersionIdFromProjectNameAndVersionName(string projectName, string projectVersionName) 

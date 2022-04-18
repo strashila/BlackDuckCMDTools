@@ -1,5 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using BlackDuckCMDTools;
+using System.Threading.Tasks;
 using System.Text;
 
 namespace BlackDuckCMDTools
@@ -9,6 +16,7 @@ namespace BlackDuckCMDTools
     public class BlackDuckAPI_meta
     {
         public string[] allow;
+        public JObject[] links;
         public string href;
     }
 }

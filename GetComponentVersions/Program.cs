@@ -167,7 +167,7 @@ namespace GetAllProjectsWithVersionCount
                         {
                             if (version._meta.href != null)
                             {
-                                string versionUUID = version._meta.href.Split('/').Last();
+                                string versionUUID = version.getVersionID();
                                 var logstring = component + ";" + version.versionName + ";" + versionUUID;
                                 if (filename != "")
                                 {
