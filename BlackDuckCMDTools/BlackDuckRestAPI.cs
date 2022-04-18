@@ -326,7 +326,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public List<BlackDuckBOMComponentVersion> GetComponentVersions (string componentId, string additionalSearchParams)
+        public List<BlackDuckComponentVersion> GetComponentVersions (string componentId, string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/components/" + componentId + "/versions" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.component-detail-5+json";
@@ -334,10 +334,8 @@ namespace BlackDuckCMDTools
             string componentVersionsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
             JObject componentVersionsJObject = JObject.Parse(componentVersionsString);
-            List<BlackDuckBOMComponentVersion> componentVersionsList = componentVersionsJObject["items"].ToObject<List<BlackDuckBOMComponentVersion>>();
+            List<BlackDuckComponentVersion> componentVersionsList = componentVersionsJObject["items"].ToObject<List<BlackDuckComponentVersion>>();
             return componentVersionsList;
-
-
         }
 
 
@@ -408,7 +406,7 @@ namespace BlackDuckCMDTools
             return componentList;
         }
 
-        public string GetComponentsJson(string projectId, string versionId, string additionalSearchParams)
+        public string GetBOMComponentsJson(string projectId, string versionId, string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/components/" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";

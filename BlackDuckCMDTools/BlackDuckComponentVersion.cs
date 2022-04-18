@@ -6,9 +6,9 @@ using System.Text;
 namespace BlackDuckCMDTools
 {
 
-    /// This class is for BOM Component Version Representation Deserialization, the members names follow API fields and don't follow c# naming conventions
+    /// This is the "KB" component version, coming from /api/components
 
-    public class BlackDuckBOMComponentVersion
+    public class BlackDuckComponentVersion
     {
         public string versionName;
         public DateTime releasedOn;

@@ -5,7 +5,7 @@ using System.Text;
 namespace BlackDuckCMDTools
 {
 
-    /// This class is for BOM Component Representation Deserialization, for simplicity the members names follow API fields and don't don't follow c# naming conventions
+    /// This is the BOM component, coming from /api/projects/{id}/versions/{id}/components. it is NOT the same as BlackDuckComponent, coming from /api/components
 
     public class BlackDuckBOMComponent
     {
