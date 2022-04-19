@@ -169,7 +169,7 @@ namespace GetAllProjectsWithVersionCount
                         {
                             if (versionUrls.Contains(codelocation.mappedProjectVersion))
                             {
-                                var versionName = bdapi.GetVersionNameByID(projectId, codelocation.mappedProjectVersion.Split('/').Last());
+                                var versionName = bdapi.GetProjectVersionNameByID(projectId, codelocation.mappedProjectVersion.Split('/').Last());
                                 var codeLocationId = codelocation._meta.href.Split('/').Last();
                                 var latestScanSummary = bdapi.GetLatestScanSummary(codeLocationId);
 

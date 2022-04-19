@@ -147,7 +147,7 @@ namespace GetAllProjectsWithVersionCount
                         var projectId = emptyVersionCombo.Item1;
                         var versionId = emptyVersionCombo.Item2;
 
-                        Console.WriteLine($"Project {bdapi.GetProjectNameByID(projectId)} version {bdapi.GetVersionNameByID(projectId, versionId)} deleted", bdapi.DeleteProjectVersionByProjectIdVersionId(projectId, versionId));
+                        Console.WriteLine($"Project {bdapi.GetProjectNameByID(projectId)} version {bdapi.GetProjectVersionNameByID(projectId, versionId)} deleted", bdapi.DeleteProjectVersionByProjectIdVersionId(projectId, versionId));
 
                         var versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
                         if (versions.Count == 1 && versions[0].versionName == "unnamed")

@@ -417,22 +417,17 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string GetBOMComponenCopyrightJson(BlackDuckBOMComponent component)
+        public string GetBOMComponenCopyrightJson(BlackDuckBOMComponent bomComponent)
         {
-            if (component.origins == null || component.origins[0] == null)
-            {
-                return "";
-            }
+            //Listing Copyrights for a Component Version and Origin. We don't check that origin exists here
 
-            else
-            {
-                var componentOriginHref = component.origins[0].origin;
-                var fullCopyrightURL = componentOriginHref + "/copyrights";
-                var acceptHeader = "application/vnd.blackducksoftware.copyright-4+json";
-                var content = new StringContent("");
-                string copyrightsString = this._httpClient.MakeHTTPRequestAsync(fullCopyrightURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
-                return copyrightsString;
-            }          
+            var componentOriginHref = bomComponent.origins[0].origin; // we only look at the first origin here
+            var fullCopyrightURL = componentOriginHref + "/copyrights";
+            var acceptHeader = "application/vnd.blackducksoftware.copyright-4+json";
+            var content = new StringContent("");
+            string copyrightsString = this._httpClient.MakeHTTPRequestAsync(fullCopyrightURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+            return copyrightsString;
+         
         }
 
 
@@ -451,7 +446,7 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string GetVersionNameByID(string projectId, string versionId)
+        public string GetProjectVersionNameByID(string projectId, string versionId)
         {
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
@@ -530,7 +525,7 @@ namespace BlackDuckCMDTools
         public string GetVersionIdFromProjectNameAndVersionName(string projectName, string projectVersionName) 
         {
             var projectId = this.GetProjectIdFromName(projectName);
-            var additinalSearchParams = "?q=versionName:" + projectVersionName;
+            var additinalSearchParams = "?limit=1&q=versionName:" + projectVersionName; // we only want one projectVersionName
             var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions" + additinalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
             var content = new StringContent("");
