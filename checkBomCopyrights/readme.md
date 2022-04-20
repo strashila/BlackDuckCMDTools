@@ -9,7 +9,7 @@ Options:
 --token | REQUIRED: BD Token  
 --bdurl | REQUIRED: BD URL  
 --projectname | REQUIRED: Project name  
---projectversionname | REQUIRED: Project version name  
+--versionname | REQUIRED: Project version name  
 --not-secure | Allways trust server certificate  
 -f, --filepath | Output filepath. If not present in options, the tool will print the output to console  
 --version | Show version information  
