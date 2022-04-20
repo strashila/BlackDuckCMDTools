@@ -10,7 +10,7 @@ Options:
 --bdurl | REQUIRED: BD URL  
 --projectname | REQUIRED: Project name  
 --versionname | REQUIRED: Version name  
---not-secure | Allways trust server certificate 
+--not-secure | Allways trust server certificate  
 -f, --filepath | Output filepath. If not present in options, the tool will print the output to console  
 --version | Show version information  
 -?, -h, --help | Show help and usage information
