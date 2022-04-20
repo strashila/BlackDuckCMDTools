@@ -38,8 +38,8 @@ namespace GetAllProjectsWithVersionCount
 
 
 
-            var _projectversionname = new Option<string>(
-                "--projectversionname",
+            var _versionname = new Option<string>(
+                "--versionname",
                 description: "REQUIRED: Project Version name"
                 );
 
@@ -65,7 +65,7 @@ namespace GetAllProjectsWithVersionCount
                 _bdurl,
                 _token,
                 _projectname,
-                _projectversionname,
+                _versionname,
                 _notsecure,
                 _filename
             };
@@ -76,7 +76,7 @@ namespace GetAllProjectsWithVersionCount
 
 
             rootCommand.SetHandler(
-            (string bdUrl, string token, string projectname, string projectversionname, bool notSecure, string filename) =>
+            (string bdUrl, string token, string projectname, string versionname, bool notSecure, string filename) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
@@ -85,7 +85,7 @@ namespace GetAllProjectsWithVersionCount
                 var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
 
-                if (token == null || bdUrl == null || projectname == null || projectversionname == null)
+                if (token == null || bdUrl == null || projectname == null || versionname == null)
                 {
                     Console.WriteLine("Parameters missing, use --help");
                     return;
@@ -143,7 +143,7 @@ namespace GetAllProjectsWithVersionCount
                 Console.WriteLine($"Getting components...");
                 Console.WriteLine();
 
-                var columnString = "ComponenName,ComponentVersionName,OriginExternalId,CopyrightsCount";
+                var columnString = "ComponenName;ComponentVersionName;OriginExternalId;CopyrightsCount";
 
                 if (filename != "")
                 {
@@ -170,7 +170,7 @@ namespace GetAllProjectsWithVersionCount
                 try
                 {
                     var projectId = bdapi.GetProjectIdFromName(projectname);
-                    var projectVersionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectname, projectversionname);
+                    var projectVersionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectname, versionname);
 
                     var bomComponents = bdapi.GetBOMComponents(projectId, projectVersionId, additionalSearchParams);
 
@@ -189,7 +189,7 @@ namespace GetAllProjectsWithVersionCount
                             }
                             
 
-                            string logString = bomComponent.componentName + "," + bomComponent.componentVersionName + "," + originExternalId + "," + totalCopyrightsString;
+                            string logString = bomComponent.componentName + ";" + bomComponent.componentVersionName + ";" + originExternalId + ";" + totalCopyrightsString;
 
                             if (filename != "")
                             {
@@ -222,7 +222,7 @@ namespace GetAllProjectsWithVersionCount
                 }
             },
 
-            _bdurl, _token, _projectname, _projectversionname, _notsecure, _filename);
+            _bdurl, _token, _projectname, _versionname, _notsecure, _filename);
 
             return rootCommand.InvokeAsync(args).Result;
         }
