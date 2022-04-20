@@ -15,9 +15,10 @@ Options:
 --version | Show version information  
 -?, -h, --help | Show help and usage information
 
-Example usage:  
-
+On Windows .NET core 3.1 is requred  
+Usage:  
 PS C:\dev\synopsys\BlackDuckCMDTools\checkBomCopyrights\bin\Debug\netcoreapp3.1> .\checkBomCopyrights.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --projectname `<projectName>` --versionname `<projectVersionName>` -f `<filePath>` --not-secure  
 
-on Linux: dotnet checkBomCopyrights.dll
+on Linux dotnet-sdk is required: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu  
+Usage: dotnet checkBomCopyrights.dll
 
