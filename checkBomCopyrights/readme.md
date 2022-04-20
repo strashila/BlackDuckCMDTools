@@ -17,4 +17,7 @@ Options:
 
 Example usage:  
 
-PS C:\dev\synopsys\BlackDuckCMDTools\checkBomCopyrights\bin\Debug\netcoreapp3.1> .\checkBomCopyrights.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --projectname `<projectName>` --versionname `<projectVersionName>` -f `<filePath>` --not-secure
+PS C:\dev\synopsys\BlackDuckCMDTools\checkBomCopyrights\bin\Debug\netcoreapp3.1> .\checkBomCopyrights.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --projectname `<projectName>` --versionname `<projectVersionName>` -f `<filePath>` --not-secure  
+
+on Linux: dotnet checkBomCopyrights.dll
+
