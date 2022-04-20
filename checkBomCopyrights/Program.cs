@@ -143,13 +143,14 @@ namespace GetAllProjectsWithVersionCount
                 Console.WriteLine($"Getting components...");
                 Console.WriteLine();
 
-                var columnString = "ComponenName,ComponentVersionName,CopyrightsCount";
+                var columnString = "ComponenName,ComponentVersionName,OriginExternalId,CopyrightsCount";
 
                 if (filename != "")
                 {
                     try
                     {
                         Logger.Log(filename, columnString);
+                        Console.WriteLine($"Writing output to file {filename}");
                     }
 
                     catch (Exception ex)
@@ -178,21 +179,17 @@ namespace GetAllProjectsWithVersionCount
                         foreach (var bomComponent in bomComponents)
                         {
                             var totalCopyrightsString = "";
-                            if (bomComponent.origins == null || bomComponent.origins.Count == 0)
-                            {
-                                totalCopyrightsString = "No origin specified";
-                            }
+                            var originExternalId = "No origin specified";
 
-                            else
+                            if (bomComponent.origins != null && bomComponent.origins.Count > 0)
                             {
                                 string copyrightsJson = bdapi.GetBOMComponenCopyrightJson(bomComponent);
                                 totalCopyrightsString = JObject.Parse(copyrightsJson)["totalCount"].ToString();
+                                originExternalId = bomComponent.origins[0].externalId;
                             }
-
-
                             
 
-                            string logString = bomComponent.componentName + "," + bomComponent.componentVersionName + "," + totalCopyrightsString;
+                            string logString = bomComponent.componentName + "," + bomComponent.componentVersionName + "," + originExternalId + "," + totalCopyrightsString;
 
                             if (filename != "")
                             {
