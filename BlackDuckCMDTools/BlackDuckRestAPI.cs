@@ -180,6 +180,31 @@ namespace BlackDuckCMDTools
         }
 
 
+        public string GenerateSbomReport(string projectId, string versionId)
+        {
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/sbom-reports";
+            var acceptHeader = "application/json";
+            var contentTypeHeader = "application/json";
+            var bodyObject = new JObject(
+                   new JProperty("reportFormat", "JSON"),
+                   new JProperty("reportType", "SBOM"),
+                   new JProperty("sbomType", "SPDX_22")
+                   );
+
+            var content = new StringContent(bodyObject.ToString(), Encoding.UTF8, contentTypeHeader);
+
+            // Create SBOM report API is not documented, and it does NOT return the result of HttpResponseMessage.
+            // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
+            // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created full report ID, like "https://BDurl/api/projects/.../versions/.../reports/f114afac-0d1c-43ce-9bf5-6b4d24576129"
+            // The report content link as for 27/04/22 is at .../reports/.../contents. Download zip link is at  .../reports/.../download.zip
+
+            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
+
+            string reportUrl = responseMessage.Headers.GetValues("Location").First();
+            return reportUrl;
+        }
+
+
 
         public string CreateVersionLicenseReport(string versionId, string reportJson)
         {
