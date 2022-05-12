@@ -85,7 +85,7 @@ namespace BlackDuckCMDTools
 
             string componentListingJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
 
-            /// This is an alternative method of parsing the Listing API response, where we don't deserialize the entire response
+            /// This is a main method of parsing the Listing API response, where we don't deserialize the entire response
             /// but parsing it with JObject.Parse and then casting the "items" list to appropriate type
             /// or we can return the entire ["items"] as string
 
@@ -156,7 +156,7 @@ namespace BlackDuckCMDTools
 
             // Create Project APi does NOT return the result of HttpResponseMessage.
             // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
-            // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created project ID /projects/7cb65d55-1194-48e4-a3b0-a831d97253ee
+            // Then you parse the Headers with Headers.GetValues and get the value of "Location" header, which contains the newly created project ID /projects/7cb65d55-1194-48e4-a3b0-a831d97253ee
 
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
             return responseMessage.ToString();
@@ -171,7 +171,7 @@ namespace BlackDuckCMDTools
 
             // Create Project APi does NOT return the result of HttpResponseMessage.
             // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
-            // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created project ID, like "/projects/7cb65d55-1194-48e4-a3b0-a831d97253ee"
+            // Then you parse the Headers with Headers.GetValues and get the value of "Location" header, which contains the newly created project ID /projects/7cb65d55-1194-48e4-a3b0-a831d97253ee
 
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
             string projectUrl = responseMessage.Headers.GetValues("Location").First();
@@ -195,8 +195,8 @@ namespace BlackDuckCMDTools
 
             // Create SBOM report API is not documented, and it does NOT return the result of HttpResponseMessage.
             // You need to read the FULL HttpResponseMessage and use Headers and StatusCode 
-            // Then you parse the Headers with Headers.GetValues and get the value of the location, which contains the newly created full report ID, like "https://BDurl/api/projects/.../versions/.../reports/f114afac-0d1c-43ce-9bf5-6b4d24576129"
-            // The report content link as for 27/04/22 is at .../reports/.../contents. Download zip link is at  .../reports/.../download.zip
+            // Then you parse the Headers with Headers.GetValues and get the value of "Location" header, which contains the newly created full report ID, like "https://BDurl/api/projects/.../versions/.../reports/f114afac-0d1c-43ce-9bf5-6b4d24576129"
+            // The report content link as for 27/04/22 is at .../reports/{reportId}/contents. Download zip link is at  .../reports/{reportId}/download.zip
 
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
 
