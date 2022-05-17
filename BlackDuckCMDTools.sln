@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeactivateUserByEmail", "De
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetComponentVersions", "GetComponentVersions\GetComponentVersions.csproj", "{DD89D1CF-5244-4ABC-A2EF-CED84D1311D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "checkBomCopyrights", "checkBomCopyrights\checkBomCopyrights.csproj", "{6282935B-9914-444F-8D32-48C6ED95A07A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "checkBomCopyrights", "checkBomCopyrights\checkBomCopyrights.csproj", "{6282935B-9914-444F-8D32-48C6ED95A07A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "checkBomCopyrightsGlobal", "checkBomCopyrightsGlobal\checkBomCopyrightsGlobal.csproj", "{DF807706-9064-439E-B178-98B70BC65B4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{6282935B-9914-444F-8D32-48C6ED95A07A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6282935B-9914-444F-8D32-48C6ED95A07A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6282935B-9914-444F-8D32-48C6ED95A07A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF807706-9064-439E-B178-98B70BC65B4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF807706-9064-439E-B178-98B70BC65B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF807706-9064-439E-B178-98B70BC65B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF807706-9064-439E-B178-98B70BC65B4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
