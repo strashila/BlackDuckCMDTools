@@ -111,6 +111,7 @@ namespace GetAllProjectsWithVersionCount
                     try
                     {
                         bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, true);
+                        bdapi.SetHttpClientLocalTimeout(1200);
                     }
 
                     catch (Exception ex)
