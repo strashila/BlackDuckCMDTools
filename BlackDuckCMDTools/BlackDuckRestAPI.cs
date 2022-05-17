@@ -53,6 +53,12 @@ namespace BlackDuckCMDTools
         }
 
 
+        public void SetHttpClientLocalTimeout(int timeout)
+        {
+            this._httpClient.Timeout = TimeSpan.FromSeconds(timeout);
+        }
+
+
         private string CreateBearerToken()
         {
             var authURL = "/api/tokens/authenticate";
