@@ -128,7 +128,7 @@ namespace GetAllProjectsWithVersionCount
 
                 Console.WriteLine($"Getting Data...");
                 Console.WriteLine();
-                Console.WriteLine($"Start time: {DateTime.Now}");
+                var startTime = DateTime.Now; 
 
                 var columnString = "ProjectName;ProjectVersionName;ComponenName;ComponentVersionName;OriginExternalId;CopyrightsCount";
 
@@ -229,7 +229,9 @@ namespace GetAllProjectsWithVersionCount
                 }
 
                 Console.WriteLine();
-                Console.WriteLine($"End time: {DateTime.Now}");
+                var endTime = DateTime.Now;
+                var timespan = endTime.Subtract(startTime);
+                Console.WriteLine($"Script start time: {startTime}, Script end time: {endTime}, Script total run: {timespan.Hours} hours {timespan.Minutes} minutes {timespan.Seconds} seconds ");
             },
 
             _bdurl, _token, _notsecure, _filename);
