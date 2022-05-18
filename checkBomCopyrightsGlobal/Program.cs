@@ -158,8 +158,7 @@ namespace GetAllProjectsWithVersionCount
                 {
                     // Hardcoding limit of 1000 projects, and 1000 versions per project just because. TODO - create project/projectVersion pagination
                     
-                    string hardcodedAddiditonalSearchParams = "?offset=0&limit=1000";
-                    
+                    string hardcodedAddiditonalSearchParams = "?offset=0&limit=1000";                    
 
                     var projects = bdapi.GetAllProjects("?offset=0&limit=1000");
 
@@ -212,11 +211,8 @@ namespace GetAllProjectsWithVersionCount
                                     bomComponents = bdapi.GetBOMComponents(projectId, versionId, componentAdditionalSearchParams);
                                 }
                             }
-
                         }
-                    }
-
-                   
+                    }        
 
 
                 }
