@@ -107,6 +107,31 @@ namespace BlackDuckCMDTools
 
 
 
+
+        public List<BlackDuckVulnerability> ListingVulnerabilitiesbyComponent(string componentId, string additionalSearchParams)
+
+
+            // /api-doc/public.html#_listing_vulnerabilities_by_component
+        {
+
+            var fullURL = this._baseUrl + "/api/components/" + componentId + "/vulnerabilities" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.vulnerability-4+json";
+            var content = new StringContent("");
+
+            string vulnerabilityListingJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            /// This is a main method of parsing the Listing API response, where we don't deserialize the entire response
+            /// but parsing it with JObject.Parse and then casting the "items" list to appropriate type
+            /// or we can return the entire ["items"] as string
+
+            JObject vulnerabilityListingJobject = JObject.Parse(vulnerabilityListingJson);
+            List<BlackDuckVulnerability> vulnList = vulnerabilityListingJobject["items"].ToObject<List<BlackDuckVulnerability>>();
+            return vulnList;
+
+        }
+
+
+
         public string DeleteProjectVersionByVersionName(string projectName, string projectVersionName)
         {
             string projectId = this.GetProjectIdFromName(projectName);
@@ -184,6 +209,9 @@ namespace BlackDuckCMDTools
             string projectId = projectUrl.Split('/').Last();
             return projectId;
         }
+
+
+
 
 
         public string GenerateSbomReport(string projectId, string versionId)
