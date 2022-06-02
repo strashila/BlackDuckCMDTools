@@ -40,7 +40,36 @@ namespace BlackDuckCMDTools
             this._authorizationBearerString = "Bearer " + _bearerToken;
         }
 
-        public BlackDuckRestAPI(string url, string token, string bdServerHash) //
+
+
+        public BlackDuckRestAPI(string url, string token, bool certValidation, int timeout)
+        {
+            this._baseUrl = url;
+            this._apiToken = token;
+            if (certValidation)
+            {
+                // This creates a regular HttpClient which does cert validation
+                this._httpClient = new HttpClient();
+                _httpClient.Timeout = TimeSpan.FromSeconds(timeout);
+
+            }
+
+            else
+            {
+                // HttpClient without cert validation. For regular httpclient use this.httpClient = new HttpClient();
+                this._httpClient = CustomHTTPclientCertificateValidationHandler.CreateHTTPClientNoCertificateValidation();
+                _httpClient.Timeout = TimeSpan.FromSeconds(timeout);
+            }
+
+            this._bearerToken = this.CreateBearerToken();
+            this._authorizationBearerString = "Bearer " + _bearerToken;
+        }
+
+
+
+
+
+        public BlackDuckRestAPI(string url, string token, string bdServerHash)
         {
             /// This is an overload constructor with server hash verification
             /// HTTPhandler is set to check specific server hash and validate by that hash            
@@ -50,12 +79,6 @@ namespace BlackDuckCMDTools
             this._httpClient = CustomHTTPclientCertificateValidationHandler.CreateHTTPClientCertificateValidationWithServerHash(bdServerHash);
             this._bearerToken = this.CreateBearerToken();
             this._authorizationBearerString = "Bearer " + _bearerToken;
-        }
-
-
-        public void SetHttpClientLocalTimeout(int timeout)
-        {
-            this._httpClient.Timeout = TimeSpan.FromSeconds(timeout);
         }
 
 

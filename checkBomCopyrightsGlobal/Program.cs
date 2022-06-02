@@ -110,9 +110,8 @@ namespace GetAllProjectsWithVersionCount
                 {
                     try
                     {
-                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, true);
-                        bdapi.SetHttpClientLocalTimeout(1200);
-                    }
+                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, true, 1200);    // Setting 20 minutes timeout in the constructor overload                  
+                    } 
 
                     catch (Exception ex)
                     {
