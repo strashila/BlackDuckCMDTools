@@ -447,7 +447,7 @@ namespace BlackDuckCMDTools
 
 
 
-        public string GetCodeLocationsReturnHTTPResponse(string additionalSearchParams)
+        public string GetAllCodeLocationsReturnHTTPResponse(string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/codelocations" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
