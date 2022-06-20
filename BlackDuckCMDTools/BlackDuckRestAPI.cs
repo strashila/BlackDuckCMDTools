@@ -425,6 +425,33 @@ namespace BlackDuckCMDTools
         }
 
 
+
+
+        public BlackDuckCodeLocation UpdateCodeLocation(string codeLocationId, string mappedProjectVersion)
+        {
+            // This is the codelocation map/unmap function
+            // What we're doing here is putting either an empty string in "mappedProjectVersion" or a valid project version
+
+            var fullURL = this._baseUrl + "/api/codelocations/" + codeLocationId;
+            var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
+            var contentTypeHeader = "application/vnd.blackducksoftware.scan-5+json";
+
+            var bodyObject = new JObject(
+                   new JProperty("mappedProjectVersion", mappedProjectVersion)  
+                   );
+
+            var content = new StringContent(bodyObject.ToString(), Encoding.UTF8, contentTypeHeader);
+
+            string codeLocationString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Put, acceptHeader, content).Result;
+
+            JObject codeLocationJObject = JObject.Parse(codeLocationString);
+            BlackDuckCodeLocation codeLocation = codeLocationJObject.ToObject<BlackDuckCodeLocation>();
+            return codeLocation;
+        }
+
+
+
+
         public List<BlackDuckComponentVersion> GetComponentVersions (string componentId, string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/components/" + componentId + "/versions" + additionalSearchParams;
