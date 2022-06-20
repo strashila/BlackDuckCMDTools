@@ -408,6 +408,23 @@ namespace BlackDuckCMDTools
         }
 
 
+
+
+        public List<BlackDuckCodeLocation> GetVersionCodeLocations(string projectId, string versionId, string additionalSearchParams)
+        {
+            // This is an "internal", undocumented API. Does not accept any custom "Accept" header, just generic application/json
+
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/codelocations" + additionalSearchParams;
+            var acceptHeader = "application/json";
+            var content = new StringContent("");
+            string codeLocationsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject codeLocationsJObject = JObject.Parse(codeLocationsString);
+            List<BlackDuckCodeLocation> codeLocationsList = codeLocationsJObject["items"].ToObject<List<BlackDuckCodeLocation>>();
+            return codeLocationsList;
+        }
+
+
         public List<BlackDuckComponentVersion> GetComponentVersions (string componentId, string additionalSearchParams)
         {
             var fullURL = this._baseUrl + "/api/components/" + componentId + "/versions" + additionalSearchParams;
@@ -628,6 +645,36 @@ namespace BlackDuckCMDTools
                 string versionID = version._meta.href.Split('/').Last();
                 return versionID;
             }
+        }
+
+
+
+        public Dictionary<string, string> GetProjectIdVersionIdFromNames(string projectName, string projectVersionName, string additionalSearchParams)
+        {           
+            
+            var projectId = this.GetProjectIdFromName(projectName);
+            var additinalSearchParams = "?limit=1&q=versionName:" + projectVersionName; // we only want one projectVersionName
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions" + additinalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.project-detail-5+json";
+            var content = new StringContent("");
+
+            string projectsVersionsString = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject versionJObject = JObject.Parse(projectsVersionsString);
+            List<BlackDuckProjectVersion> versionList = versionJObject["items"].ToObject<List<BlackDuckProjectVersion>>();
+
+            BlackDuckProjectVersion version = versionList[0]; // we only want one version
+            string versionId = version._meta.href.Split('/').Last();
+
+
+            var projectAndVersion = new Dictionary<string, string>()
+            {
+                { "projectId", projectId},
+                { "versionId",  versionId}
+
+            };
+
+            return projectAndVersion;
         }
 
 
