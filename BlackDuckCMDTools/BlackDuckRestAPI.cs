@@ -430,7 +430,7 @@ namespace BlackDuckCMDTools
         public BlackDuckCodeLocation UpdateCodeLocation(string codeLocationId, string mappedProjectVersion)
         {
             // This is the codelocation map/unmap function
-            // What we're doing here is putting either an empty string in "mappedProjectVersion" or a valid project version
+            // What we're doing here is putting either an empty string in "mappedProjectVersion" or a valid Full project version URL
 
             var fullURL = this._baseUrl + "/api/codelocations/" + codeLocationId;
             var acceptHeader = "application/vnd.blackducksoftware.scan-5+json";
