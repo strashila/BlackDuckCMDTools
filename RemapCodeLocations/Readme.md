@@ -10,7 +10,7 @@ Usage: RemapCodeLocations [options]
 Options:  
 
  --token <token>               | REQUIRED: BD Token  
- --bdurl <bdurl>               | REQUIRED: BD URL 
+ --bdurl <bdurl>               | REQUIRED: BD URL  
  --projectname <projectname>   | REQUIRED: Project Name  
-  --not-secure                 | Allways trust server certificate  
-  --filename <filenameh>    | Output filename to save codelocations JSON. If not present in options, the tool will create a default output in the run folder
+ --not-secure                  | Allways trust server certificate  
+ --filename <filenameh>        | Output filename to save codelocations JSON. If not present in options, the tool will create a default output in the run folder
