@@ -47,11 +47,9 @@ namespace GetAllProjectsWithVersionCount
 
             var _filename = new Option<string>(
                 "--filename",
-                description: "Write all Project Codelocations to a json file. If no filename specified, a json is created in the run directory ",
-                getDefaultValue: () => ""
+                description: "Log all Project Codelocations to a json file. If no filename is specified a json will be created in the run directory"                
                 );
-
-            _filename.AddAlias("-f");
+        
 
 
             var rootCommand = new RootCommand
@@ -134,6 +132,7 @@ namespace GetAllProjectsWithVersionCount
 
                 try
                 {
+                    Console.WriteLine($"Getting codelocations for project \"{projectname}\"...");
                     var projectId = bdapi.GetProjectIdFromName(projectname);
                     var versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
 
@@ -174,29 +173,27 @@ namespace GetAllProjectsWithVersionCount
 
                     // Writing all this precious info from the dict to JSON just in case
 
-                    if (filename != "")
-                    {
-                        try
-                        {
-                            Logger.Log(filename, versionCodeLocationJsonObject.ToString());
-                            Console.WriteLine($"Writing output to file {filename}");
-                        }
+                    var defaultLogFilename = projectname + "_codelocations.json";
 
-                        catch (Exception ex)
-                        //Catching exception for invalid FilePath input
-                        {
-                            if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
-                            {
-                                Console.WriteLine($"\n{ex.Message} or filename not specified");
-                                return;
-                            }
-                        }
+                    if (filename != "" && filename != null)
+                    {
+                        defaultLogFilename = filename;
                     }
 
-                    else if (filename == "" || filename == null)
+                    try
                     {
-                        var defaultLogFilename = projectname + "_" + DateTime.Now.ToString("yyyy-MM-dd") + "_codelocations" + ".json";
                         Logger.Log(defaultLogFilename, versionCodeLocationJsonObject.ToString());
+                        Console.WriteLine($"Writing codelocations to file {defaultLogFilename}");
+                    }
+
+                    catch (Exception ex)
+                    //Catching exception for invalid FilePath input
+                    {
+                        if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
+                        {
+                            Console.WriteLine($"\n{ex.Message}");
+                            return;
+                        }
                     }
 
 
