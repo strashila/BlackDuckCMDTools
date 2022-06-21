@@ -5,7 +5,7 @@
 4. The Unmapping: iterate over the dict, for each key iterate over the list of codelocations, and set "mappedProjectVersion" to "" for each one.  
 5. The Re-map: iterate over the dict again, iterate over the list of codelocations, and set "mappedProjectVersion" to the key (full version url) for each one.  
 
-The tool uses ?offset=0&limit=1000 for all API calls, no pagination.   
+The tool uses "?offset=0&limit=1000" for all API calls, no pagination.   
 
 Usage: RemapCodeLocations [options]  
 
