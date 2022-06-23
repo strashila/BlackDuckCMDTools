@@ -16,3 +16,11 @@ Options:
  --projectname <projectname>   | REQUIRED: Project Name  
  --not-secure                  | Allways trust server certificate  
  --filename <filename>         | Output filename to save codelocations JSON. If not present in options, the tool will create a default json in the run folder
+
+ 
+On Windows .NET core 3.1 is requred  
+Usage:  
+PS C:\dev\synopsys\BlackDuckCMDTools\RemapCodeLocations\bin\Debug\netcoreapp3.1> .\RemapCodeLocations.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --projectname `<projectName>` -f `<filePath>` --not-secure  
+
+on Linux "dotnet-sdk" package is required: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu  
+Usage: dotnet RemapCodeLocations.dll
