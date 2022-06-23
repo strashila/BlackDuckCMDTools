@@ -20,7 +20,7 @@ Options:
  
 On Windows .NET core 3.1 is requred  
 Usage:  
-PS C:\dev\synopsys\BlackDuckCMDTools\RemapCodeLocations\bin\Debug\netcoreapp3.1> .\RemapCodeLocations.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --projectname `<projectName>` -f `<filePath>` --not-secure  
+PS C:\dev\synopsys\BlackDuckCMDTools\RemapCodeLocations\bin\Debug\netcoreapp3.1> .\RemapCodeLocations.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --projectname `<projectName>` --filename `<filePath>` --not-secure  
 
 on Linux "dotnet-sdk" package is required: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu  
 Usage: dotnet RemapCodeLocations.dll
