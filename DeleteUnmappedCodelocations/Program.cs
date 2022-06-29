@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GetAllProjectsWithVersionCount
 {
@@ -25,6 +26,10 @@ namespace GetAllProjectsWithVersionCount
             var token = new Option<string>("--token");
             token.Description = "REQUIRED: BD Token";
 
+
+            var filename = new Option<string>("--filename");
+            filename.Description = "Optional: filename";
+
             var notSecure = new Option<bool>("--not-secure");
             //secureConnection.SetDefaultValue(false);
             notSecure.Description = "Disable secure connection to BlackDuck server";
@@ -34,10 +39,11 @@ namespace GetAllProjectsWithVersionCount
             {
                 bdUrl,
                 token,
-                notSecure
+                notSecure,
+                filename
             };
 
-            rootCommand.Handler = CommandHandler.Create<string, string, bool>((bdUrl, token, notSecure) =>
+            rootCommand.Handler = CommandHandler.Create<string, string, bool, string>((bdUrl, token, notSecure, filename) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
@@ -46,6 +52,11 @@ namespace GetAllProjectsWithVersionCount
                 long totalSize = 0;
 
                 var additionalSearchParams = $"?offset={offset}&limit={limit}";
+
+                if (filename == null || filename == "")
+                {
+                    filename = "deletedCodelocations.json";
+                }
 
                 
                 if (token == "" || bdUrl == "")
@@ -115,7 +126,7 @@ namespace GetAllProjectsWithVersionCount
                     Console.WriteLine();
                     Console.WriteLine("Listing Unmapped codelocations...");
 
-
+                    var codeLocationJArray = new JArray();
                     
                     while (codeLocations.Count > 0)
                     {
@@ -124,11 +135,20 @@ namespace GetAllProjectsWithVersionCount
                             if (codelocation.mappedProjectVersion == null)
                             {
                                 var codeLocationId = codelocation._meta.href.Split("/").Last();
+
+                                var codelocationsJObject = new JObject
+                                {
+                                  {"codeLocationName", codelocation.name},
+                                  {"codeLocationId", codeLocationId}
+                                };
+                                codeLocationJArray.Add(codelocationsJObject);
+
+                                Console.WriteLine($"{codelocation.name} {codeLocationId}");
+
                                 totalSize += codelocation.scanSize;
-                                unmappedCodelocationsCount++;
-                                Console.WriteLine(codelocation.name);
+                                unmappedCodelocationsCount++;                                
                                 unmappedCodelocationsList.Add(codelocation);
-                            }
+                             }
                         }
 
 
@@ -162,14 +182,32 @@ namespace GetAllProjectsWithVersionCount
 
                     Console.WriteLine("Deleting codelocations...");
 
-                    foreach (BlackDuckCodeLocation scan in unmappedCodelocationsList)
+                    foreach (BlackDuckCodeLocation codelocation in unmappedCodelocationsList)
                     {
-                        var codeLocationId = scan._meta.href.Split("/").Last();
-                        Console.WriteLine($"Deleting codeLocation {scan.name} {bdapi.DeleteCodelocation(codeLocationId)}");
+                        var codeLocationId = codelocation._meta.href.Split("/").Last();
+                        Console.WriteLine($"Deleting codeLocation {codelocation.name} {codeLocationId} {bdapi.DeleteCodelocation(codeLocationId)}");
                     }
 
                     Console.WriteLine();
                     Console.WriteLine($"{unmappedCodelocationsCount} unmapped codelocations deleted. Total scan size: {totalSize}");
+                    Console.WriteLine();
+
+
+                    try
+                    {
+                        Logger.Log(filename, codeLocationJArray.ToString());
+                        Console.WriteLine($"Writing deleted codelocations to file {filename}");
+                    }
+
+                    catch (Exception ex)
+                    //Catching exception for invalid FilePath input
+                    {
+                        if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
+                        {
+                            Console.WriteLine($"\n{ex.Message}");
+                            return;
+                        }
+                    }
                 }
 
                 catch (Exception ex)
