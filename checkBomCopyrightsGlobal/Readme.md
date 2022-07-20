@@ -5,7 +5,7 @@ The tool builds a CSV-like output with component name, version, origin external 
 
 Usage: checkBomCopyrightsGlobal [options]
 
-Options:
+Options:  
 --token | REQUIRED: BD Token  
 --bdurl | REQUIRED: BD URL  
 --not-secure | Allways trust server certificate  
