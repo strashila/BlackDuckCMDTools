@@ -8,8 +8,8 @@ There are 2 ways to use it: with "versionname" specified, and without. If versio
 Usage: checkBomCopyrights [options]
 
 Options:
---token | REQUIRED: BD Token  
---bdurl | REQUIRED: BD URL  
+--token | REQUIRED: BlackDuck Token  
+--bdurl | REQUIRED: BlackDuck URL  
 --projectname | REQUIRED: Project name  
 --versionname | Project version name. If not specified, the tool will iterate over all the versions of the project.  
 --not-secure | Allways trust server certificate  
