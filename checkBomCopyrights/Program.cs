@@ -40,7 +40,7 @@ namespace GetAllProjectsWithVersionCount
 
             var _versionname = new Option<string>(
                 "--versionname",
-                description: "REQUIRED: Project Version name"
+                description: "Project Version name. If not specified the tool will iterate over all the versions of the project"
                 );
 
 
@@ -80,12 +80,8 @@ namespace GetAllProjectsWithVersionCount
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
-                var offset = 0;
-                var limit = 1000;
-                var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
-
-                if (token == null || bdUrl == null || projectname == null || versionname == null)
+                if (token == null || bdUrl == null || projectname == null)
                 {
                     Console.WriteLine("Parameters missing, use --help");
                     return;
@@ -143,7 +139,7 @@ namespace GetAllProjectsWithVersionCount
                 Console.WriteLine($"Getting components...");
                 Console.WriteLine();
 
-                var columnString = "ComponenName;ComponentVersionName;OriginExternalId;CopyrightsCount";
+                var columnString = "ProjectName;ProjectVersionName;ComponenName;ComponentVersionName;OriginExternalId;CopyrightsCount";
 
                 if (filename != "")
                 {
@@ -169,55 +165,42 @@ namespace GetAllProjectsWithVersionCount
 
                 try
                 {
+                    
+                    // We are working up to 1000 versions per project, no pagination
+
+                    var offset = 0;
+                    var limit = 1000;
+                    var additionalSearchParams = $"?offset={offset}&limit={limit}";
+
                     var projectId = bdapi.GetProjectIdFromName(projectname);
-                    var projectVersionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectname, versionname);
 
-                    var bomComponents = bdapi.GetBOMComponents(projectId, projectVersionId, additionalSearchParams);
-
-                    while (bomComponents.Count > 0)
+                    if (versionname == null)
+                    // if no version is specified we will iterate over all the versions of the project
                     {
-                        foreach (var bomComponent in bomComponents)
+                        var versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
+
+                        foreach (var version in versions)
                         {
-                            var totalCopyrightsString = "";
-                            var originExternalId = "No origin specified";
-
-                            if (bomComponent.origins != null && bomComponent.origins.Count > 0)
-                            {
-                                string copyrightsJson = bdapi.GetBOMComponenCopyrightJson(bomComponent);
-                                totalCopyrightsString = JObject.Parse(copyrightsJson)["totalCount"].ToString();
-                                originExternalId = bomComponent.origins[0].externalId;
-                            }
-                            
-
-                            string logString = bomComponent.componentName + ";" + bomComponent.componentVersionName + ";" + originExternalId + ";" + totalCopyrightsString;
-
-                            if (filename != "")
-                            {
-                                Logger.Log(filename, logString);
-                            }
-                            else
-                            {
-                                Console.WriteLine(logString);
-                            }
-                        }
-
-                        if (bomComponents.Count < limit)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            offset = offset + limit;
-                            additionalSearchParams = $"?offset={offset}&limit={limit}";
-                            bomComponents = bdapi.GetBOMComponents(projectId, projectVersionId, additionalSearchParams);
+                            var versionId = version._meta.href.Split("/").Last();
+                            printProjectVersionCopyrights(bdapi, projectname, projectId, version.versionName, versionId, filename);
                         }
                     }
+                    else if (versionname != null)
+                    {
+                        var projectVersionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectname, versionname);
+
+                        printProjectVersionCopyrights(bdapi, projectname, projectId, versionname, projectVersionId, filename);
+                    }
+
+
+                    
+
                 }
 
                 catch (Exception ex)
                 {
                     // Catching Serialization errors
-                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl, token, Project Name and Project Version Name");
+                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl, token, Project Name or Project Version Name");
                     return;
                 }
             },
@@ -225,6 +208,58 @@ namespace GetAllProjectsWithVersionCount
             _bdurl, _token, _projectname, _versionname, _notsecure, _filename);
 
             return rootCommand.InvokeAsync(args).Result;
+        }
+
+        public static void printProjectVersionCopyrights(BlackDuckRestAPI bdapi, string projectName, string projectId, string versionName, string versionId,string filename)
+        {           
+
+            var offset = 0;
+            var limit = 1000;
+            var additionalSearchParams = $"?offset={offset}&limit={limit}";
+            
+
+            var bomComponents = bdapi.GetBOMComponents(projectId, versionId, additionalSearchParams);
+
+            while (bomComponents.Count > 0)
+            {
+                foreach (var bomComponent in bomComponents)
+                {
+                    var totalCopyrightsString = "";
+                    var originExternalId = "No origin specified";
+
+                    if (bomComponent.origins != null && bomComponent.origins.Count > 0) 
+                    
+                    // Copyrights are a function of component origin. No origin - no copyrights                    
+                    {
+                        string copyrightsJson = bdapi.GetBOMComponenCopyrightJson(bomComponent);
+                        totalCopyrightsString = JObject.Parse(copyrightsJson)["totalCount"].ToString();                        
+                        originExternalId = bomComponent.origins[0].externalId;
+                    }
+
+
+                    string logString = string.Format(projectName + ";" + versionName + ";" + bomComponent.componentName + ";" + bomComponent.componentVersionName + ";" + originExternalId + ";" + totalCopyrightsString);
+
+                    if (filename != "")
+                    {
+                        Logger.Log(filename, logString);
+                    }
+                    else
+                    {
+                        Console.WriteLine(logString);
+                    }
+                }
+
+                if (bomComponents.Count < limit)
+                {
+                    break;
+                }
+                else
+                {
+                    offset = offset + limit;
+                    additionalSearchParams = $"?offset={offset}&limit={limit}";
+                    bomComponents = bdapi.GetBOMComponents(projectId, versionId, additionalSearchParams);
+                }
+            }
         }
     }
 }
