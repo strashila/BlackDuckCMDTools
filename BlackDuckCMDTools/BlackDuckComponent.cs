@@ -12,7 +12,6 @@ namespace BlackDuckCMDTools
     {
         public string name; //"google.golang.org/protobuf"
         public string description; 
-
         public string url; // source url "http://github.com/aws/aws-sdk-go-v2/
         public string approvalStatus; // "UNREVIEWED"
         public string primaryLanguage; // Java"
@@ -20,7 +19,4 @@ namespace BlackDuckCMDTools
         public string type; //  "COMPONENT"        
         public BlackDuckAPI_meta _meta;
     }
-
-
-
 }
