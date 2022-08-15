@@ -552,10 +552,14 @@ namespace BlackDuckCMDTools
             var acceptHeader = "application/vnd.blackducksoftware.copyright-4+json";
             var content = new StringContent("");
             string copyrightsString = this._httpClient.MakeHTTPRequestAsync(fullCopyrightURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
-            return copyrightsString;
-         
+            return copyrightsString;         
         }
 
+
+        /// <summary>
+        /// TODO - Get component origin, we need "releasedOn" from there to add to the Daimler script.
+        /// https://us1a-sup-hub-knurenko01.nprd.sig.synopsys.com/api-doc/public.html#_reading_a_single_component_origin 
+        /// <returns></returns>
 
 
 
