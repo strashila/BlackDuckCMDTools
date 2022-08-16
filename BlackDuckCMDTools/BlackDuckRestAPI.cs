@@ -101,6 +101,7 @@ namespace BlackDuckCMDTools
         public void RefreshBearerToken()
         {
             this._bearerToken = this.CreateBearerToken();
+            this._authorizationBearerString = "Bearer " + this._bearerToken;
         }
 
 
@@ -556,10 +557,39 @@ namespace BlackDuckCMDTools
         }
 
 
-        /// <summary>
-        /// TODO - Get component origin, we need "releasedOn" from there to add to the Daimler script.
-        /// https://us1a-sup-hub-knurenko01.nprd.sig.synopsys.com/api-doc/public.html#_reading_a_single_component_origin 
-        /// <returns></returns>
+
+
+        public BlackDuckKBcomponentOrigin GetKBComponenOrigin(BlackDuckBOMComponent bomComponent)
+        {
+            //Getting KB component origin from BOM component
+
+            var fullOriginURL = bomComponent.origins[0].origin; // this is the complete KB origin href for the first origin only
+            var acceptHeader = "application/vnd.blackducksoftware.component-detail-5+json";
+            var content = new StringContent("");
+            string originJsonString = this._httpClient.MakeHTTPRequestAsync(fullOriginURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject originObj = JObject.Parse(originJsonString);
+            BlackDuckKBcomponentOrigin componentOrigin = originObj.ToObject<BlackDuckKBcomponentOrigin>();
+            return componentOrigin;
+        }
+
+
+
+        public string GetKBComponenOriginCopyrightsJson (BlackDuckKBcomponentOrigin origin)
+        {
+            //Getting the complete copyrights JSON for KB component origin
+
+            var componentOriginHref = origin._meta.href;
+
+            var fullCopyrightURL = componentOriginHref + "/copyrights"; 
+            var acceptHeader = "application/vnd.blackducksoftware.copyright-4+json";
+            var content = new StringContent("");
+
+            string copyrightsString = this._httpClient.MakeHTTPRequestAsync(fullCopyrightURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+            return copyrightsString;
+        }
+
+
 
 
 

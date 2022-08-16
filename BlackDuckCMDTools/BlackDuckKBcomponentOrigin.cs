@@ -17,6 +17,6 @@ namespace BlackDuckCMDTools
         public string originId; // "coreutils-single/8.30-8.el8/x86_64"
         public string externalNamespace; // "redhat"
         public string externalId;
-        public BlackDuckAPI_meta meta;
+        public BlackDuckAPI_meta _meta;
     }
 }

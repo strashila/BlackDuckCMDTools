@@ -103,7 +103,7 @@ namespace GetAllProjectsWithVersionCount
                 {
                     try
                     {
-                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, false);
+                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, false, 7200);  // Setting 2 hours timeout in the constructor overload     
                     }
 
                     catch (Exception ex)
@@ -121,7 +121,7 @@ namespace GetAllProjectsWithVersionCount
                 {
                     try
                     {
-                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, true);
+                        bdapi = new BlackDuckCMDTools.BlackDuckRestAPI(bdUrl, token, true, 7200);
                     }
 
                     catch (Exception ex)
@@ -136,10 +136,11 @@ namespace GetAllProjectsWithVersionCount
                     }
                 }
 
-                Console.WriteLine($"Getting components...");
+                Console.WriteLine("Start time: " + DateTime.Now);
+                Console.WriteLine("Getting components...");
                 Console.WriteLine();
 
-                var columnString = "ProjectName;ProjectVersionName;ComponenName;ComponentVersionName;OriginExternalId;CopyrightsCount";
+                var columnString = "ProjectName;ProjectVersionName;ComponenName;ComponentVersionName;OriginExternalId;OriginReleasedOn;CopyrightsCount";
 
                 if (filename != "")
                 {
@@ -163,8 +164,8 @@ namespace GetAllProjectsWithVersionCount
                 else Console.WriteLine(columnString);
 
 
-                try
-                {
+                //try
+                //{
                     
                     // We are working up to 1000 versions per project, no pagination
 
@@ -183,6 +184,7 @@ namespace GetAllProjectsWithVersionCount
                         {
                             var versionId = version._meta.href.Split("/").Last();
                             printProjectVersionCopyrights(bdapi, projectname, projectId, version.versionName, versionId, filename);
+                            bdapi.RefreshBearerToken();
                         }
                     }
                     else if (versionname != null)
@@ -190,19 +192,18 @@ namespace GetAllProjectsWithVersionCount
                         var projectVersionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectname, versionname);
 
                         printProjectVersionCopyrights(bdapi, projectname, projectId, versionname, projectVersionId, filename);
-                    }
+                    }                   
 
+                //}
 
-                    
+                //catch (Exception ex)
+                //{
+                //    // Catching Serialization errors
+                //    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl, token, Project Name or Project Version Name");
+                //    return;
+                //}
 
-                }
-
-                catch (Exception ex)
-                {
-                    // Catching Serialization errors
-                    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl, token, Project Name or Project Version Name");
-                    return;
-                }
+                Console.WriteLine("End time: " + DateTime.Now);
             },
 
             _bdurl, _token, _projectname, _versionname, _notsecure, _filename);
@@ -224,20 +225,27 @@ namespace GetAllProjectsWithVersionCount
             {
                 foreach (var bomComponent in bomComponents)
                 {
-                    var totalCopyrightsString = "";
+                    var totalCopyrightsString = "";                    
                     var originExternalId = "No origin specified";
+                    DateTime? releasedOn = null;
 
                     if (bomComponent.origins != null && bomComponent.origins.Count > 0) 
                     
-                    // Copyrights are a function of component origin. No origin - no copyrights                    
+                    // Copyrights are a function of component origin. No origin - no copyrights
+                    // Now we are getting into the origin
                     {
-                        string copyrightsJson = bdapi.GetBOMComponenCopyrightJson(bomComponent);
-                        totalCopyrightsString = JObject.Parse(copyrightsJson)["totalCount"].ToString();                        
-                        originExternalId = bomComponent.origins[0].externalId;
+                        var copyrightsJson = bdapi.GetBOMComponenCopyrightJson(bomComponent);
+                        var origin = bdapi.GetKBComponenOrigin(bomComponent);
+                        
+
+                        // updating variables
+                        totalCopyrightsString = JObject.Parse(copyrightsJson)["totalCount"].ToString();
+                        originExternalId = origin.originId;
+                        releasedOn = origin.releasedOn;
                     }
 
 
-                    string logString = string.Format(projectName + ";" + versionName + ";" + bomComponent.componentName + ";" + bomComponent.componentVersionName + ";" + originExternalId + ";" + totalCopyrightsString);
+                    string logString = string.Format(projectName + ";" + versionName + ";" + bomComponent.componentName + ";" + bomComponent.componentVersionName + ";" + originExternalId + ";" + releasedOn + ";" + totalCopyrightsString);
 
                     if (filename != "")
                     {
