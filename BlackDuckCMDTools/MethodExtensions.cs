@@ -8,7 +8,7 @@ namespace BlackDuckCMDTools
 {
 
     /// <summary>
-    /// Method extensions for the library
+    /// System.Net.Http.httpClient Method extensions for the library
     /// </summary>
     public static class MethodExtensions
     {
@@ -25,8 +25,8 @@ namespace BlackDuckCMDTools
                 Content = content
             };
 
-            var response = await httpClient.SendAsync(httpRequestMessage);
-            var responseContent = response.Content.ReadAsStringAsync().Result;
+            HttpResponseMessage response = await httpClient.SendAsync(httpRequestMessage);
+            string responseContent = response.Content.ReadAsStringAsync().Result;
 
             return responseContent;
         }
