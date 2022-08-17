@@ -21,11 +21,20 @@ namespace BlackDuckCMDTools
                 }
             }
 
-
-            using (StreamWriter sw = File.AppendText(path))
+            else
             {
-                sw.WriteLine(text);
+                //using (StreamWriter sw = File.AppendText(path))
+                //{
+                //    sw.WriteLine(text);
+                //}
+                using (StreamWriter sw = new StreamWriter(filePath, true, Encoding.UTF8, 65536))
+                {
+                    sw.WriteLine(text);
+                }
             }
+
+
+
 
         }
     }
