@@ -1,7 +1,7 @@
 **checkBomCopyrights** is a tool that checks the existence of copyrights for a specific project version BOM.  
 
 
-The tool builds a CSV-like output with component name, version, origin external ID and number of available copyrights.  
+The tool builds a CSV-like output with Project Name, Project Version, Component name, Component version, Origin ID, Origin released date, and the number of available copyrights.  
 There are 2 ways to use it: with "versionname" specified, and without. If versionname is not specified, the tool will iterate over all the versions of the project.   
 
 
