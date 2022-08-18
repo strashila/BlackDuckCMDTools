@@ -243,6 +243,7 @@ namespace GetAllProjectsWithVersionCount
                 {
                     break;
                 }
+
                 else
                 {
                     offset = offset + limit;
