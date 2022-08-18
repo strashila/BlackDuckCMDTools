@@ -129,7 +129,7 @@ namespace GetAllProjectsWithVersionCount
                     }
                 }
 
-                Console.WriteLine("\nStart time: " + DateTime.Now);
+                Console.WriteLine($"\nStart time: {DateTime.Now}\n");
                 Console.WriteLine("Getting components...\n");                
 
                 var columnString = "ProjectName;ProjectVersionName;ComponenName;ComponentVersionName;OriginExternalId;OriginReleasedOn;CopyrightsCount";
@@ -142,10 +142,23 @@ namespace GetAllProjectsWithVersionCount
 
                 Console.WriteLine($"Writing output to file {filename}");
 
-                using (StreamWriter sw = new StreamWriter(@filename))
+                try
                 {
-                    sw.WriteLine(columnString);
+                    using (StreamWriter sw = new StreamWriter(@filename))
+                    {
+                        sw.WriteLine(columnString);
+                    }
                 }
+
+                catch (Exception ex)
+                {
+                    if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
+                    {
+                        Console.WriteLine($"\nError: {ex.Message}");
+                        return;
+                    }
+                }
+
 
                 try
                 {
@@ -183,7 +196,7 @@ namespace GetAllProjectsWithVersionCount
                    return;                    
                 }
 
-                Console.WriteLine("End time: " + DateTime.Now);
+                Console.WriteLine($"\nEnd time: {DateTime.Now}\n");
 
             },
 
