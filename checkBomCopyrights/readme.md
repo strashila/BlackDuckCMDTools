@@ -13,7 +13,7 @@ Options:
 --projectname | REQUIRED: Project name  
 --versionname | Project version name. If not specified, the tool will iterate over all the versions of the project.  
 --not-secure | Allways trust server certificate  
--f, --filepath | Output filepath. If not present in options, the tool will print the output to console  
+-f, --filename | Output filepath. If not present in options, the tool create a default filename, i.e. {projectName}_copyrights.txt  
 --version | Show version information  
 -?, -h, --help | Show help and usage information
 
