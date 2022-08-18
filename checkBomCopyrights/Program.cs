@@ -197,7 +197,6 @@ namespace GetAllProjectsWithVersionCount
                 }
 
                 Console.WriteLine($"\nEnd time: {DateTime.Now}\n");
-
             },
 
             _bdurl, _token, _projectname, _versionname, _notsecure, _filename);
