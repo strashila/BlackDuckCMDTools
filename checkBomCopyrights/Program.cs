@@ -179,7 +179,7 @@ namespace GetAllProjectsWithVersionCount
                 catch (Exception ex)
                 {
                    // Catching ALL exceptions
-                   Console.WriteLine("\nError: " + ex.ToString() + "\n\n" + ex.Message + "\n\nStack: " + ex.StackTrace);
+                   Console.WriteLine($"\nError: { ex.Message} \nPlease make sure that you have the correct BlackDuck URL, Token, Project Name and Version Name");
                    return;                    
                 }
 
