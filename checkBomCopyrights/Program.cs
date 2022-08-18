@@ -15,7 +15,6 @@ namespace GetAllProjectsWithVersionCount
     {
         static int Main(string[] args)
         {
-
             /// Uses the beta System.CommandLine library to parse command line arguments 
             /// https://github.com/dotnet/command-line-api/blob/main/docs/Your-first-app-with-System-CommandLine.md
 
@@ -30,19 +29,15 @@ namespace GetAllProjectsWithVersionCount
                 description: "REQUIRED: BD Token"
                 );
 
-
             var _projectname = new Option<string>(
                 "--projectname",
                 description: "REQUIRED: Project Name"
                 );
 
-
-
             var _versionname = new Option<string>(
                 "--versionname",
                 description: "Project Version name. If not specified the tool will iterate over all the versions of the project"
                 );
-
 
             var _notsecure = new Option<bool>(
                 "--not-secure",
@@ -50,10 +45,9 @@ namespace GetAllProjectsWithVersionCount
                 getDefaultValue: () => false
                 );
 
-
             var _filename = new Option<string>(
                 "--filename",
-                description: "Write output to file",
+                description: "Write output to file. If not specified a default file will be created in the run directory, {projectName}_copyrights.txt",
                 getDefaultValue: () => ""
                 );
 
@@ -79,7 +73,7 @@ namespace GetAllProjectsWithVersionCount
             (string bdUrl, string token, string projectname, string versionname, bool notSecure, string filename) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
-
+                string defaultFileName = projectname + "_copyrights.txt";
 
                 if (token == null || bdUrl == null || projectname == null)
                 {
@@ -94,7 +88,6 @@ namespace GetAllProjectsWithVersionCount
                         bdUrl = bdUrl.Remove(bdUrl.LastIndexOf("/"));
                     }
                 }
-
 
                 /// Trying to create connection to the API both secure and not-secure methods (trusting all SSL certificates or not).
                 /// Catching errors both times
@@ -136,37 +129,26 @@ namespace GetAllProjectsWithVersionCount
                     }
                 }
 
-                Console.WriteLine("Start time: " + DateTime.Now);
-                Console.WriteLine("Getting components...");
-                Console.WriteLine();
+                Console.WriteLine("\nStart time: " + DateTime.Now);
+                Console.WriteLine("Getting components...\n");                
 
                 var columnString = "ProjectName;ProjectVersionName;ComponenName;ComponentVersionName;OriginExternalId;OriginReleasedOn;CopyrightsCount";
 
-                if (filename != "")
+                if (filename == "" || filename == null)                
                 {
-                    try
-                    {
-                        Logger.Log(filename, columnString);
-                        Console.WriteLine($"Writing output to file {filename}");
-                    }
-
-                    catch (Exception ex)
-                    //Catching exception for invalid FilePath input
-                    {
-                        if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
-                        {
-                            Console.WriteLine($"\n{ex.Message} or filename not specified");
-                            return;
-                        }
-                    }
+                    // Not writing anything to console, file output only
+                    filename = defaultFileName;                   
                 }
 
-                else Console.WriteLine(columnString);
+                Console.WriteLine($"Writing output to file {filename}");
 
+                using (StreamWriter sw = new StreamWriter(@filename))
+                {
+                    sw.WriteLine(columnString);
+                }
 
-                //try
-                //{
-                    
+                try
+                {
                     // We are working up to 1000 versions per project, no pagination
 
                     var offset = 0;
@@ -190,20 +172,19 @@ namespace GetAllProjectsWithVersionCount
                     else if (versionname != null)
                     {
                         var projectVersionId = bdapi.GetVersionIdFromProjectNameAndVersionName(projectname, versionname);
-
                         printProjectVersionCopyrights(bdapi, projectname, projectId, versionname, projectVersionId, filename);
-                    }                   
+                    }
+                }
 
-                //}
-
-                //catch (Exception ex)
-                //{
-                //    // Catching Serialization errors
-                //    Console.WriteLine("\nError:" + ex.Message + " Please verify that you have correct BDurl, token, Project Name or Project Version Name");
-                //    return;
-                //}
+                catch (Exception ex)
+                {
+                   // Catching ALL exceptions
+                   Console.WriteLine("\nError: " + ex.ToString() + "\n\n" + ex.Message + "\n\nStack: " + ex.StackTrace);
+                   return;                    
+                }
 
                 Console.WriteLine("End time: " + DateTime.Now);
+
             },
 
             _bdurl, _token, _projectname, _versionname, _notsecure, _filename);
@@ -211,14 +192,13 @@ namespace GetAllProjectsWithVersionCount
             return rootCommand.InvokeAsync(args).Result;
         }
 
-        public static void printProjectVersionCopyrights(BlackDuckRestAPI bdapi, string projectName, string projectId, string versionName, string versionId,string filename)
-        {           
-
+        public static void printProjectVersionCopyrights(BlackDuckRestAPI bdapi, string projectName, string projectId, string versionName, string versionId, string filePath)
+        {
             var offset = 0;
             var limit = 1000;
             var additionalSearchParams = $"?offset={offset}&limit={limit}";
+            StreamWriter sw = new StreamWriter(@filePath, true);
             
-
             var bomComponents = bdapi.GetBOMComponents(projectId, versionId, additionalSearchParams);
 
             while (bomComponents.Count > 0)
@@ -229,35 +209,25 @@ namespace GetAllProjectsWithVersionCount
                     var originExternalId = "No origin specified";
                     DateTime? releasedOn = null;
 
-                    if (bomComponent.origins != null && bomComponent.origins.Count > 0) 
-                    
-                    // Copyrights are a function of component origin. No origin - no copyrights
-                    // Now we are getting into the origin
+                    if (bomComponent.origins != null && bomComponent.origins.Count > 0)                    
+                    // Copyrights are a function of component origin. No origin - no copyrights                    
                     {
                         var copyrightsJson = bdapi.GetBOMComponenCopyrightJson(bomComponent);
                         var origin = bdapi.GetKBComponenOrigin(bomComponent);
                         
-
                         // updating variables
                         totalCopyrightsString = JObject.Parse(copyrightsJson)["totalCount"].ToString();
                         originExternalId = origin.originId;
                         releasedOn = origin.releasedOn;
                     }
 
-
                     string logString = string.Format(projectName + ";" + versionName + ";" + bomComponent.componentName + ";" + bomComponent.componentVersionName + ";" + originExternalId + ";" + releasedOn + ";" + totalCopyrightsString);
 
-                    if (filename != "")
-                    {
-                        Logger.Log(filename, logString);
-                    }
-                    else
-                    {
-                        Console.WriteLine(logString);
-                    }
+                    // Not writing to console anymore, only to file
+                    sw.WriteLine(logString);
                 }
 
-                if (bomComponents.Count < limit)
+                if (bomComponents.Count < limit) // checking if this is the last iteration
                 {
                     break;
                 }
@@ -268,6 +238,8 @@ namespace GetAllProjectsWithVersionCount
                     bomComponents = bdapi.GetBOMComponents(projectId, versionId, additionalSearchParams);
                 }
             }
+
+            sw.Close(); // Closing the file, disposing of the StreamWriter
         }
     }
 }
