@@ -134,6 +134,8 @@ namespace GetAllProjectsWithVersionCount
                 {
                     Console.WriteLine($"Getting codelocations for project \"{projectname}\"...");
                     var projectId = bdapi.GetProjectIdFromName(projectname);
+
+                    // Not paginating for versions with 1000 limit
                     var versions = bdapi.GetProjectVersionsFromProjectId(projectId, additionalSearchParams);
 
                     // Creating a dict with all versions and all codeLocations
@@ -145,6 +147,8 @@ namespace GetAllProjectsWithVersionCount
                     {
                         var fullVersionUrl = version._meta.href;
                         var versionId = fullVersionUrl.Split("/").Last();
+
+                        // Not paginating for code locations with 1000 limit as well
                         var codelocationsList = bdapi.GetVersionCodeLocations(projectId, versionId, additionalSearchParams);
 
                         var codeLocationIdList = new List<string>();
