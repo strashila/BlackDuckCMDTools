@@ -314,7 +314,7 @@ namespace BlackDuckCMDTools
             return policyRules;
         }
 
-        public string ReturnBearerToken()
+        public string ShowBearerToken()
         {
             return this._bearerToken;
         }
