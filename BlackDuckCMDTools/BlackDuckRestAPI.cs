@@ -171,6 +171,27 @@ namespace BlackDuckCMDTools
 
 
 
+        public string UpdateLicenseStatus(BlackDuckLicense license, string newLicenseStatus)
+        {
+            
+            var fullUrl = license._meta.href;
+            var acceptHeader = "application/vnd.blackducksoftware.component-detail-5+json";
+            var contentTypeHeader = "application/vnd.blackducksoftware.component-detail-5+json";
+
+            var licenseObject = new JObject(
+                new JProperty("name", license.name),
+                new JProperty("licenseFamily", JObject.FromObject(license.licenseFamily)),
+                new JProperty("licenseStatus", newLicenseStatus.ToUpper())
+                );
+
+            var content = new StringContent(licenseObject.ToString(), Encoding.UTF8, contentTypeHeader);
+            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullUrl, this._authorizationBearerString, HttpMethod.Put, acceptHeader, content).Result;
+
+            return ((int)responseMessage.StatusCode).ToString() + " " + responseMessage.StatusCode.ToString();
+        }
+
+
+
 
         public string DeleteProjectVersionByVersionName(string projectName, string projectVersionName)
         {
@@ -251,25 +272,6 @@ namespace BlackDuckCMDTools
         }
 
 
-        public string UpdateLicenseStatus(BlackDuckLicense license, string newLicenseStatus)
-        {
-            var licenseId = license._meta.href.Split("/").Last();
-            var fullUrl = this._baseUrl + "/api/licenses/" + licenseId;
-            var acceptHeader = "application/vnd.blackducksoftware.component-detail-5+json";
-            var contentTypeHeader = "application/vnd.blackducksoftware.component-detail-5+json";
-
-            var licenseObject = new JObject(
-                new JProperty("name", license.name),
-                new JProperty("licenseFamily", JObject.FromObject(license.licenseFamily)),
-                new JProperty("licenseStatus", newLicenseStatus)
-                );
-
-            var content = new StringContent(licenseObject.ToString(), Encoding.UTF8, contentTypeHeader);
-            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullUrl, this._authorizationBearerString, HttpMethod.Put, acceptHeader, content).Result;
-
-            return ((int)responseMessage.StatusCode).ToString() + " " + responseMessage.StatusCode.ToString();
-        }
-
 
         public string GenerateSbomReport(string projectId, string versionId)
         {
@@ -310,9 +312,6 @@ namespace BlackDuckCMDTools
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
             return responseMessage.ToString();
         }
-
-
-       
 
 
 
