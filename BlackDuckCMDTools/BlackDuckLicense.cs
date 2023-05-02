@@ -9,18 +9,11 @@ namespace BlackDuckCMDTools
 
     public class BlackDuckLicense
     {
-        public string name;
-        public string[] licenseFamily;
+        public string name;       
         public string ownership;
         public string licenseStatus;
-        public DateTime expirationDate;
+        public string licenseSource;
+        public BlackDuckLicenseFamily licenseFamily;
         public BlackDuckAPI_meta _meta;
-
-
-        public string GetProjectId()
-        {
-            return _meta.href.Split("/").Last();
-        }
-
     }
 }

@@ -67,8 +67,6 @@ namespace BlackDuckCMDTools
 
 
 
-
-
         public BlackDuckRestAPI(string url, string token, string bdServerHash)
         {
             /// This is an overload constructor with server hash verification
@@ -134,10 +132,8 @@ namespace BlackDuckCMDTools
 
         public List<BlackDuckVulnerability> ListingVulnerabilitiesbyComponent(string componentId, string additionalSearchParams)
 
-
             // /api-doc/public.html#_listing_vulnerabilities_by_component
         {
-
             var fullURL = this._baseUrl + "/api/components/" + componentId + "/vulnerabilities" + additionalSearchParams;
             var acceptHeader = "application/vnd.blackducksoftware.vulnerability-4+json";
             var content = new StringContent("");
@@ -151,8 +147,28 @@ namespace BlackDuckCMDTools
             JObject vulnerabilityListingJobject = JObject.Parse(vulnerabilityListingJson);
             List<BlackDuckVulnerability> vulnList = vulnerabilityListingJobject["items"].ToObject<List<BlackDuckVulnerability>>();
             return vulnList;
-
         }
+
+
+        public List<BlackDuckLicense> GetLicenses (string additionalSearchParams)
+
+        // /api-doc/public.html#_listing_vulnerabilities_by_component
+        {
+            var fullURL = this._baseUrl + "/api/licenses" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.component-detail-5+json";
+            var content = new StringContent("");
+
+            string licenseListingJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            /// This is a main method of parsing the Listing API response, where we don't deserialize the entire response
+            /// but parsing it with JObject.Parse and then deserializing the "items" list to appropriate type
+            /// or we can return the entire ["items"] as string
+
+            JObject licensesListingJobject = JObject.Parse(licenseListingJson);
+            List<BlackDuckLicense> licenseList = licensesListingJobject["items"].ToObject<List<BlackDuckLicense>>();
+            return licenseList;
+        }
+
 
 
 
@@ -235,7 +251,24 @@ namespace BlackDuckCMDTools
         }
 
 
+        public string UpdateLicenseStatus(BlackDuckLicense license, string newLicenseStatus)
+        {
+            var licenseId = license._meta.href.Split("/").Last();
+            var fullUrl = this._baseUrl + "/api/licenses/" + licenseId;
+            var acceptHeader = "application/vnd.blackducksoftware.component-detail-5+json";
+            var contentTypeHeader = "application/vnd.blackducksoftware.component-detail-5+json";
 
+            var licenseObject = new JObject(
+                new JProperty("name", license.name),
+                new JProperty("licenseFamily", JObject.FromObject(license.licenseFamily)),
+                new JProperty("licenseStatus", newLicenseStatus)
+                );
+
+            var content = new StringContent(licenseObject.ToString(), Encoding.UTF8, contentTypeHeader);
+            HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullUrl, this._authorizationBearerString, HttpMethod.Put, acceptHeader, content).Result;
+
+            return ((int)responseMessage.StatusCode).ToString() + " " + responseMessage.StatusCode.ToString();
+        }
 
 
         public string GenerateSbomReport(string projectId, string versionId)
@@ -277,6 +310,10 @@ namespace BlackDuckCMDTools
             HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Post, acceptHeader, content).Result;
             return responseMessage.ToString();
         }
+
+
+       
+
 
 
         public string DeactivateUser(BlackDuckUser user)
