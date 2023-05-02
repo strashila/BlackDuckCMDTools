@@ -171,6 +171,26 @@ namespace BlackDuckCMDTools
 
 
 
+
+        public BlackDuckLicense GetSingleLicense(string licenseUrl)
+
+        {
+            var fullURL = licenseUrl;
+            var acceptHeader = "application/vnd.blackducksoftware.component-detail-5+json";
+            var content = new StringContent("");
+
+            string licenseJson = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            //In case we need to get a single license there is no [items] array, we can deserialize the json as is into the type
+     
+            var license = JsonConvert.DeserializeObject<BlackDuckLicense>(licenseJson);
+            return license;
+        }
+
+
+
+
+
         public string UpdateLicenseStatus(BlackDuckLicense license, string newLicenseStatus)
         {
             
