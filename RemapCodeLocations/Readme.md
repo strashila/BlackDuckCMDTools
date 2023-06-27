@@ -1,7 +1,7 @@
 **RemapCodeLocations** follows the following workflow:  
 1. Take a project and iterate over its versions to get the codelocations for each version.  
 2. Parse all codelocations and create a dictionary with key: full version URL, and value: list of codelocation id's.  
-3. Create a json file with the dictionary, which functions as a backup.  
+3. Create a json file with the dictionary, which functions as a backup (Windows only).  
 4. The Unmapping: iterate over the dict, for each key iterate over the list of codelocations, and set "mappedProjectVersion" to "" for each codelocation.  
 5. The Re-map: iterate over the dict again, iterate over the list of codelocations, and set "mappedProjectVersion" to the key (full version url) for each codelocation.  
 
