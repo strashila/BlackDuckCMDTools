@@ -18,7 +18,7 @@ Options:
  --filename <filename>         | Output filename to save codelocations JSON. If not present in options, the tool will create a default json in the run folder
 
  
-On Windows .NET core 3.1 is requred  
+On Windows .NET 6.0 is requred  
 Usage:  
 PS C:\dev\synopsys\BlackDuckCMDTools\RemapCodeLocations\bin\Debug\netcoreapp3.1> .\RemapCodeLocations.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --projectname `<projectName>` --filename `<filePath>` --not-secure  
 
