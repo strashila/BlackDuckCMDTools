@@ -163,15 +163,22 @@ namespace GetAllProjectsWithVersionCount
                             codelocationJArray.Add(codelocationId);
                         }
 
-                        versionCodeLocationDict.Add(fullVersionUrl, codeLocationIdList);
+                        // Checking if we're adding code locations for the specific version or for everything
 
-                        versionCodeLocationJsonArray.Add(
-                            new JObject
-                            {
+                        if (versionname == null || (versionname != null && versionname == version.versionName))
+                        {
+                            versionCodeLocationDict.Add(fullVersionUrl, codeLocationIdList);
+
+                            // Adding all the relevant code locations to Json for console output
+
+                            versionCodeLocationJsonArray.Add(
+                                new JObject
+                                {
                                 {"versionName", version.versionName },
                                 {"url", fullVersionUrl},
                                 {"codeLocations", codelocationJArray}
-                            });
+                                });
+                        }
                     }
 
 
@@ -227,6 +234,6 @@ namespace GetAllProjectsWithVersionCount
             return rootCommand.InvokeAsync(args).Result;
         }
 
-        
+       
     }
 }
