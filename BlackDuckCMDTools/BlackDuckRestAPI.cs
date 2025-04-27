@@ -484,7 +484,7 @@ namespace BlackDuckCMDTools
 
 
 
-        public BlackDuckCodeLocation UpdateCodeLocation(string codeLocationId, string mappedProjectVersion)
+        public BlackDuckCodeLocation UpdateCodeLocationVersionMapping(string codeLocationId, string mappedProjectVersion)
         {
             // This is the codelocation map/unmap function
             // What we're doing here is putting either an empty string in "mappedProjectVersion" or a valid Full project version URL

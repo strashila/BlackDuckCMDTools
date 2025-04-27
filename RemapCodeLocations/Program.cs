@@ -38,6 +38,13 @@ namespace GetAllProjectsWithVersionCount
                 );
 
 
+            var _versionname = new Option<string>(
+                "--versionname",
+                 description: "Optional: Version Name"
+                 );
+
+
+
             var _notsecure = new Option<bool>(
                 "--not-secure",
                 description: "Trust the certificate of the BD server",
@@ -45,20 +52,14 @@ namespace GetAllProjectsWithVersionCount
                 );
 
 
-            var _filename = new Option<string>(
-                "--filename",
-                description: "Log all Project Codelocations to a json file. If no filename is specified a json will be created in the run directory"                
-                );
-        
-
 
             var rootCommand = new RootCommand
             {
                 _bdurl,
                 _token,
                 _projectname,
-                _notsecure,
-                _filename
+                _notsecure
+                
             };
 
 
@@ -67,7 +68,7 @@ namespace GetAllProjectsWithVersionCount
 
 
             rootCommand.SetHandler(
-            (string bdUrl, string token, string projectname, bool notSecure, string filename) =>
+            (string bdUrl, string token, string projectname, string versionname, bool notSecure) =>
             {
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
@@ -173,32 +174,12 @@ namespace GetAllProjectsWithVersionCount
                             });
                     }
 
-                    var versionCodeLocationJsonObject = new JObject(new JProperty("versions", versionCodeLocationJsonArray));
 
-                    // Writing all this precious info from the dict to JSON just in case
 
-                    var defaultLogFilename = projectname + "_codelocations.json";
+                    // Writing all this precious info from the dict to console output just in case
 
-                    if (filename != "" && filename != null)
-                    {
-                        defaultLogFilename = filename;
-                    }
+                    Console.WriteLine(new JObject(new JProperty("versions", versionCodeLocationJsonArray)).ToString());
 
-                    try
-                    {
-                        Logger.Log(defaultLogFilename, versionCodeLocationJsonObject.ToString());
-                        Console.WriteLine($"Writing codelocations to file {defaultLogFilename}");
-                    }
-
-                    catch (Exception ex)
-                    //Catching exception for invalid FilePath input
-                    {
-                        if (ex is DirectoryNotFoundException || ex is UnauthorizedAccessException)
-                        {
-                            Console.WriteLine($"\n{ex.Message}");
-                            return;
-                        }
-                    }
 
 
 
@@ -211,7 +192,7 @@ namespace GetAllProjectsWithVersionCount
                         var codelocationsIdList = versionClPair.Value;
                         foreach (var codelocationId in codelocationsIdList)
                         {
-                            var unmappedCodeloc = bdapi.UpdateCodeLocation(codelocationId, "");
+                            var unmappedCodeloc = bdapi.UpdateCodeLocationVersionMapping(codelocationId, "");
                         }
                     }
 
@@ -227,7 +208,7 @@ namespace GetAllProjectsWithVersionCount
                         var codelocationIdList = versionClPair.Value;
                         foreach (var codelocationId in codelocationIdList)
                         {
-                            var mappedCodeloc = bdapi.UpdateCodeLocation(codelocationId, versionClPair.Key);
+                            var mappedCodeloc = bdapi.UpdateCodeLocationVersionMapping(codelocationId, versionClPair.Key);
                         }
                     }
                 }
@@ -241,9 +222,11 @@ namespace GetAllProjectsWithVersionCount
                 }
             },
 
-            _bdurl, _token, _projectname, _notsecure, _filename);
+            _bdurl, _token, _projectname, _versionname, _notsecure);
 
             return rootCommand.InvokeAsync(args).Result;
         }
+
+        
     }
 }
