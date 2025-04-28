@@ -157,7 +157,6 @@ namespace GetAllProjectsWithVersionCount
                         if (versionname == null || (versionname != null && versionname == version.versionName))
 
                         {
-
                             var versionId = version._meta.href.Split("/").Last();
 
                             // Not paginating for code locations with 1000 limit as well
@@ -218,6 +217,7 @@ namespace GetAllProjectsWithVersionCount
                         foreach (var codelocationId in codelocationsIdList)
                         {
                             var unmappedCodeloc = bdapi.UpdateCodeLocationVersionMapping(codelocationId, "");
+                            Console.WriteLine(codelocationId);
                         }
                     }
 
@@ -248,6 +248,7 @@ namespace GetAllProjectsWithVersionCount
                         foreach (var codelocationId in codelocationIdList)
                         {
                             var mappedCodeloc = bdapi.UpdateCodeLocationVersionMapping(codelocationId, versionClPair.Key._meta.href);
+                            Console.WriteLine(codelocationId);
                         }
                     }
                 }
