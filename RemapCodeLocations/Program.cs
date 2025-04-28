@@ -5,6 +5,7 @@ using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.ConstrainedExecution;
 using System.Threading;
 using BlackDuckCMDTools;
 using Newtonsoft.Json;
@@ -40,7 +41,7 @@ namespace GetAllProjectsWithVersionCount
 
             var _versionname = new Option<string>(
                 "--versionname",
-                 description: "Optional: Version Name"
+                 description: "Optional: Project Version Name. If this is not passed, the tool iterates over ALL the versions of the project"
                  );
 
 
@@ -58,6 +59,7 @@ namespace GetAllProjectsWithVersionCount
                 _bdurl,
                 _token,
                 _projectname,
+                _versionname,
                 _notsecure
                 
             };
@@ -73,7 +75,7 @@ namespace GetAllProjectsWithVersionCount
                 BlackDuckCMDTools.BlackDuckRestAPI bdapi;
 
                 var offset = 0;
-                var limit = 1000;
+                var limit = 1000; // 1000 versions for project hardcoded
                 var additionalSearchParams = $"?offset={offset}&limit={limit}";
 
                 if (token == null || bdUrl == null || projectname == null)
@@ -133,7 +135,10 @@ namespace GetAllProjectsWithVersionCount
 
                 try
                 {
-                    Console.WriteLine($"Getting codelocations for project \"{projectname}\"...");
+                    Console.WriteLine();
+                    Console.WriteLine($"Getting codelocations for project {projectname}...");
+                    Console.WriteLine();
+
                     var projectId = bdapi.GetProjectIdFromName(projectname);
 
                     // Not paginating for versions with 1000 limit
@@ -141,33 +146,35 @@ namespace GetAllProjectsWithVersionCount
 
                     // Creating a dict with all versions and all codeLocations
 
-                    var versionCodeLocationDict = new Dictionary<string, List<string>>();
+                    var versionCodeLocationDict = new Dictionary<BlackDuckProjectVersion, List<string>>();
                     var versionCodeLocationJsonArray = new JArray();
 
                     foreach (var version in versions)
-                    {
-                        var fullVersionUrl = version._meta.href;
-                        var versionId = fullVersionUrl.Split("/").Last();
-
-                        // Not paginating for code locations with 1000 limit as well
-                        var codelocationsList = bdapi.GetVersionCodeLocations(projectId, versionId, additionalSearchParams);
-
-                        var codeLocationIdList = new List<string>();
-
-                        JArray codelocationJArray = new JArray();
-
-                        foreach (BlackDuckCodeLocation codelocation in codelocationsList)
-                        {
-                            var codelocationId = codelocation._meta.href.Split("/").Last();
-                            codeLocationIdList.Add(codelocationId);
-                            codelocationJArray.Add(codelocationId);
-                        }
-
+                    {                    
+                        
                         // Checking if we're adding code locations for the specific version or for everything
 
                         if (versionname == null || (versionname != null && versionname == version.versionName))
+
                         {
-                            versionCodeLocationDict.Add(fullVersionUrl, codeLocationIdList);
+
+                            var versionId = version._meta.href.Split("/").Last();
+
+                            // Not paginating for code locations with 1000 limit as well
+                            var codelocationsList = bdapi.GetVersionCodeLocations(projectId, versionId, additionalSearchParams);
+
+                            var codeLocationIdList = new List<string>();
+
+                            JArray codelocationJArray = new JArray();
+
+                            foreach (BlackDuckCodeLocation codelocation in codelocationsList)
+                            {
+                                var codelocationId = codelocation._meta.href.Split("/").Last();
+                                codeLocationIdList.Add(codelocationId);
+                                codelocationJArray.Add(codelocationId);
+                            }
+
+                            versionCodeLocationDict.Add(version, codeLocationIdList);
 
                             // Adding all the relevant code locations to Json for console output
 
@@ -175,12 +182,23 @@ namespace GetAllProjectsWithVersionCount
                                 new JObject
                                 {
                                 {"versionName", version.versionName },
-                                {"url", fullVersionUrl},
+                                {"url", version._meta.href},
                                 {"codeLocations", codelocationJArray}
                                 });
                         }
                     }
 
+                    if (versionname == null)
+
+                    {
+                        Console.WriteLine($"Printing all Versions and CodeLocations for project {projectname}");
+                    }
+
+                    else
+                    {
+                        Console.WriteLine($"Printing all Versions and CodeLocations for project {projectname} version {versionname}");
+
+                    }
 
 
                     // Writing all this precious info from the dict to console output just in case
@@ -188,14 +206,14 @@ namespace GetAllProjectsWithVersionCount
                     Console.WriteLine(new JObject(new JProperty("versions", versionCodeLocationJsonArray)).ToString());
 
 
-
-
-                    // Iterating over our dict and unmapping all codelocations
-
-                    Console.WriteLine($"Unmmapping codelocations for project \"{projectname}\"...");
-
                     foreach (var versionClPair in versionCodeLocationDict)
                     {
+                        // Iterating over our dict and unmapping all codelocations
+
+                        Console.WriteLine();
+                        Console.WriteLine($"Unmmapping codelocations for project {projectname} version {versionClPair.Key.versionName}...");
+                        Console.WriteLine();
+    
                         var codelocationsIdList = versionClPair.Value;
                         foreach (var codelocationId in codelocationsIdList)
                         {
@@ -206,16 +224,30 @@ namespace GetAllProjectsWithVersionCount
 
                     // Iterating over our dict and mapping all codelocations back
 
+                    
+                    Console.WriteLine();
+                    Console.WriteLine();
+
+                    if (versionCodeLocationDict.Count == 0)
+                    {
+                        Console.WriteLine("No code locations found for project version");
+                        return; // nothing to do, non existing project version
+                    }
+
                     Console.WriteLine("Re-mapping codelocation...");
+                    Console.WriteLine();
 
                     Thread.Sleep(5000);                                   
 
                     foreach (var versionClPair in versionCodeLocationDict)
                     {
+                        Console.WriteLine($"Re-Mapping codelocations for project {projectname} version {versionClPair.Key.versionName}...");
+                        Console.WriteLine();
+
                         var codelocationIdList = versionClPair.Value;
                         foreach (var codelocationId in codelocationIdList)
                         {
-                            var mappedCodeloc = bdapi.UpdateCodeLocationVersionMapping(codelocationId, versionClPair.Key);
+                            var mappedCodeloc = bdapi.UpdateCodeLocationVersionMapping(codelocationId, versionClPair.Key._meta.href);
                         }
                     }
                 }
