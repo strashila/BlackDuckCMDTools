@@ -22,5 +22,7 @@ Options:
   --version                    | Show version information  
   -?, -h, --help               | Show help and usage information  
  
- Example usage:
-C:\dev\synopsys\BlackDuckCMDTools\GetBomMatchedFiles\bin\Debug\netcoreapp3.1>GetBomMatchedFiles.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `<projectName>` --versionname `<projectVersionName>` -f `c:\temp\components.txt` --not-secure --filter `filter=bomMatchType:FILE_DEPENDENCY_TRANSITIVE`
+Example usage:
+GetBomMatchedFiles.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `<projectName>` --versionname `<projectVersionName>` -f `c:\temp\components.txt` --not-secure --filter `filter=bomMatchType:FILE_DEPENDENCY_TRANSITIVE`
+
+On Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install

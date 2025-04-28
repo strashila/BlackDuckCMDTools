@@ -11,4 +11,5 @@ Example usage:
 DeactivateUsersByEmail.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --email `user@email.com` --trust-cert
 
 Linux:  
+on Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 dotnet DeactivateUsersByEmail.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --email `user@email.com` --trust-cert

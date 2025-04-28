@@ -17,5 +17,5 @@ On Windows .NET core 3.1 is requred
 Usage:  
 .\checkBomCopyrightsGlobal.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  -f `<filePath>` --not-secure  
 
-on Linux "dotnet-sdk" package is required: https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu  
+on Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 Usage: dotnet checkBomCopyrightsGlobal.dll

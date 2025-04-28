@@ -17,4 +17,6 @@ Options:
 Example usage:  
 
 GetComponentVersions.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --component `<componentId>` -f `<filename>` --not-secure  
-On Linux: dotnet GetComponentVersions.dll
+
+On Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
+dotnet GetComponentVersions.dll

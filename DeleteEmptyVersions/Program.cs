@@ -102,6 +102,7 @@ namespace GetAllProjectsWithVersionCount
 
                 try
                 {
+                    Console.WriteLine();
                     Console.WriteLine("Warning - you are about to delete all versions with no scans associated with them from your instance. To continue type \"Yes\"");
                     string concent = Console.ReadLine();
                     if (concent.ToLower() != "yes")

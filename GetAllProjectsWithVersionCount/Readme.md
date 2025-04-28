@@ -13,3 +13,4 @@ Options:
  -?, -h, --help               | Show help and usage information  
  
 
+On Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install

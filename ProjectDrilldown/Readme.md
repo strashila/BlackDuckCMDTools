@@ -15,5 +15,7 @@ Options:
 Example usage:  
 ProjectDrilldown.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `MyProject` -f `c:\temp\myproject.txt` --not-secure
 
-Linux:  
+Linux: 
+
+On Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 dotnet ProjectDrilldown.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>` --projectname `MyProject`

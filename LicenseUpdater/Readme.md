@@ -10,4 +10,6 @@ Example usage:
 LicenseUpdater.exe --bdurl `<your-bd-server-url>` --token `<your-bd-token>` --csvfile `c:\temp\licenses_reviewed.csv` --not-secure
 
 Linux:  
+
+On Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 dotnet LicenseUpdater.dll --bdurl `<your-bd-server-url>` --token `<your-bd-token>` --csvfile `/home/user/licenses_reviewed.csv` --not-secure

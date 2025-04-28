@@ -18,4 +18,7 @@ Options:
 
 Example usage:  
 
-C:\dev\synopsys\BlackDuckCMDTools\GetComponentsUUID\bin\Debug\netcoreapp3.1>GetComponentsUUID.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --projectname `<projectName>` --versionname `<projectVersionName>` -f `<filePath>` --not-secure
+GetComponentsUUID.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>`  --projectname `<projectName>` --versionname `<projectVersionName>` -f `<filePath>` --not-secure
+
+
+On Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install

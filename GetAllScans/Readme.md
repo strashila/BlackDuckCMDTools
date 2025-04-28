@@ -17,4 +17,5 @@ Example usage:
 GetAllScans.exe --token `<your-bd-token>` --bdurl `<your-bd-server-url>` -f `c:\temp\codelocations.txt` --not-secure
 
 Linux:  
+On Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 dotnet GetAllScans.dll --token `<your-bd-token>` --bdurl `<your-bd-server-url>`

@@ -11,7 +11,11 @@ Options:
 --version | Show version information  
 -?, -h, --help | Show help and usage information  
 
-Example looking for any log4j components (Linux with dotnet package)  
+Example looking for any log4j components (Linux with dotnet package) 
+
+On Linux dotnet-runtime-8.0 package is required: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
+
+
 $ dotnet GetComponentUsedProjects.dll --bdurl={url} --token={token} --component=log4j --not-secure
 
 
