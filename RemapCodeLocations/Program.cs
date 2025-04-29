@@ -84,6 +84,22 @@ namespace GetAllProjectsWithVersionCount
                     return;
                 }
 
+                if (versionname == null)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"Are you sure you want to run this script over ALL the versions of the project {projectname}? This may take a while");
+                    Console.WriteLine("Type \"Y\" or \"Yes\" to confirm");
+                    
+                    string confirm = Console.ReadLine();
+                    string[] correctAnswers = { "yes", "y" };
+                    
+                    if (correctAnswers.Contains(confirm.ToLower()) == false)
+                    {
+                        Console.WriteLine("Choice was not confirmed, exiting");
+                        return;
+                    }
+                }
+
                 else
                 {
                     if (bdUrl.LastIndexOf("/") == bdUrl.Length - 1) // URL ends with "/"
@@ -135,8 +151,14 @@ namespace GetAllProjectsWithVersionCount
 
                 try
                 {
+                    string versionName = "";
+                    if (versionname != null)
+                    {
+                        versionName = "Version " + versionname;
+                    }
+
                     Console.WriteLine();
-                    Console.WriteLine($"Getting codelocations for project {projectname}...");
+                    Console.WriteLine($"Getting requested codelocations for Project {projectname} {versionName}");
                     Console.WriteLine();
 
                     var projectId = bdapi.GetProjectIdFromName(projectname);
@@ -187,18 +209,6 @@ namespace GetAllProjectsWithVersionCount
                         }
                     }
 
-                    if (versionname == null)
-
-                    {
-                        Console.WriteLine($"Printing all Versions and CodeLocations for project {projectname}");
-                    }
-
-                    else
-                    {
-                        Console.WriteLine($"Printing all Versions and CodeLocations for project {projectname} version {versionname}");
-
-                    }
-
 
                     // Writing all this precious info from the dict to console output just in case
 
@@ -234,7 +244,7 @@ namespace GetAllProjectsWithVersionCount
                         return; // nothing to do, non existing project version
                     }
 
-                    Console.WriteLine("Re-mapping codelocation...");
+                    Console.WriteLine("Re-mapping codelocations...");
                     Console.WriteLine();
 
                     Thread.Sleep(5000);                                   
