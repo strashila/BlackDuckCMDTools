@@ -1,6 +1,6 @@
 <h2>BlackDuckCMDTools</h2>  
 
-Command line tools for Black Duck Rest API. Written in C# and .NET 8.0 framework
+Command line tools for Black Duck Rest API. Written in C# for .NET 8.0 framework
 
 
 On Windows use the xxx.exe
