@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemapCodeLocations", "Remap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseUpdater", "LicenseUpdater\LicenseUpdater.csproj", "{E8F7B58C-264A-4FBF-A71E-641C0E4F4CF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateVulnerabilityRemediation", "UpdateVulnerabilityRemediation\UpdateVulnerabilityRemediation.csproj", "{7E8A3E26-6612-4344-9187-A8D63A61BBBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{E8F7B58C-264A-4FBF-A71E-641C0E4F4CF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8F7B58C-264A-4FBF-A71E-641C0E4F4CF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E8F7B58C-264A-4FBF-A71E-641C0E4F4CF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E8A3E26-6612-4344-9187-A8D63A61BBBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E8A3E26-6612-4344-9187-A8D63A61BBBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E8A3E26-6612-4344-9187-A8D63A61BBBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E8A3E26-6612-4344-9187-A8D63A61BBBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

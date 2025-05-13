@@ -482,6 +482,52 @@ namespace BlackDuckCMDTools
         }
 
 
+        public List<BlackDuckVulnerableBomComponent> GetBOMsVulnerableComponents (string projectId, string versionId, string additionalSearchParams)
+        {
+            /// <summary>
+            ///   This is specifically for /api-doc/public.html#_listing_a_boms_vulnerable_components, Api V8
+            /// 
+            ///   GET /api/projects/{projectId}/versions/{projectVersionId}/vulnerable-bom-components
+            ///   Accept: application/vnd.blackducksoftware.bill-of-materials-8+json
+            /// </summary>
+
+            var fullURL = this._baseUrl + "/api/projects/" + projectId + "/versions/" + versionId + "/vulnerable-bom-components" + additionalSearchParams;
+            var acceptHeader = "application/vnd.blackducksoftware.bill-of-materials-8+json";
+            var content = new StringContent("");
+            string response = this._httpClient.MakeHTTPRequestAsync(fullURL, this._authorizationBearerString, HttpMethod.Get, acceptHeader, content).Result;
+
+            JObject bomVulnerableComponentsJObject = JObject.Parse(response);
+            List<BlackDuckVulnerableBomComponent> bomVulnerableComponents = bomVulnerableComponentsJObject["items"].ToObject<List<BlackDuckVulnerableBomComponent>>();
+            return bomVulnerableComponents;
+        }
+
+
+        public string UpdateBomVulnerabilityRemediation(BlackDuckVulnerableBomComponent vulnerableComponent, string requestBody)
+        {
+            /// <summary>
+            ///   This is specifically for api-doc/public.html#update-bom-component-version-vulnerability-remediation
+            /// 
+            ///   It does not matter if this is "Updating a BOM Component Version’s Vulnerability Remediation" endpoint or Updating a BOM Component Version Origin’s Vulnerability Remediation endpoint
+            ///   As we get the URL for the remediation from _meta.href anyway
+            ///   Content-Type: application/vnd.blackducksoftware.bill-of-materials-6+json
+            /// </summary>
+
+            var fullURL = vulnerableComponent._meta.href;
+            var contentTypeHeader = "application/vnd.blackducksoftware.bill-of-materials-6+json";
+
+            var content = new StringContent(requestBody, Encoding.UTF8, contentTypeHeader);
+
+            HttpResponseMessage response = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullURL, this._authorizationBearerString, HttpMethod.Put, contentTypeHeader, content).Result;
+
+
+            //HttpResponseMessage responseMessage = this._httpClient.MakeHTTPRequestReturnFullResponseMessage(fullUrl, this._authorizationBearerString, HttpMethod.Put, acceptHeader, content).Result;
+
+            return ((int)response.StatusCode).ToString() + " " + response.StatusCode.ToString();
+
+            //return response;
+        }
+
+
 
 
         public BlackDuckCodeLocation UpdateCodeLocationVersionMapping(string codeLocationId, string mappedProjectVersion)
